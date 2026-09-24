@@ -16,7 +16,7 @@
    `data/raw/A-<年度>.json` に保存。CSV ダウンロードは使わない (1,000 件上限、ダイアログ)。公開サービスなので
    CI で定期再取得しない。手動で実行する。
 2. `scripts/build.py`: 正規化して `data/surveys.parquet` (GeoParquet 1.0.0) と、ダッシュボード用の
-   `docs/data/series/<key>.json` (key = reiwa / all / 受付年度)・`docs/data/summary.json` を作る。
+   `docs/data/matrix.json` (受付年度 × 市町村の件数、計画機関別の内訳付き)・`docs/data/summary.json` を作る。
    冗長なキーは一致を assert してから捨てる。読み替えできない名前があっても止めず、`unresolved_names` に残す。
 
 ## コミットするもの
@@ -34,20 +34,21 @@
 
 ## 数え方
 
-- 関与件数 (主): 測量が関与した各市町村に 1 件。
-- 按分件数 (補助): 1/関与市町村数ずつ。道全体の合計が測量件数と一致する。
+- 件数: 測量が関わった市町村それぞれに 1 件 (複数の市町村にまたがる測量は各市町村に 1 件)。按分はしない (D11)。
 - 受付年度 (`year`) は 4 月〜翌 3 月。当年度は途中。
 
 ## ダッシュボード (docs/)
 
 - `docs/survey-plugin.js` が Open MCT のツリーを作る。objects / composition / objectViews の provider だけを使い、
-  Telemetry API は使わない。ルートは独自 type `dosurvey.root` (概要ビュー)、その下に組み込み `folder` の
-  「関与件数」「按分件数」、その下に令和・全期間・各年度 (新しい順) のリーフ `dosurvey.map`。
-- 描画は `docs/vendor/do/tabularmap.js` の `TabularMap.create`。値は段階の番号 (順序尺度 6 段、区切りは期間の長さで
-  単年度・令和・全期間の 3 種)、正確な件数と主な計画機関は `notes`。区切りを変えたら DECISIONS に書く。
+  Telemetry API は使わない。ルートは独自 type `dosurvey.root` (概要ビュー)、その下にリーフ `dosurvey.map` の
+  「期間を選んで見る」(年度範囲のスライダー付き) と、組み込み `folder` の「年度別」→ 各年度 (新しい順)。
+- 描画は `docs/vendor/do/tabularmap.js` の `TabularMap.create`。値は段階の番号 (順序尺度 6 段、区切りは選んだ年数で
+  伸縮)。マウスオーバーは「件数」と「計画機関」(上位 3) だけで、`survey-plugin.js` が描画コアのツールチップの中身を
+  差し替える。区切りやツールチップを変えたら DECISIONS に書く。
 - Open MCT は unpkg の 4.3.1 に固定 (tabularmaps/do と同じ)。`window.SharedWorker = undefined` を先に置く。
 - ローカル確認は `.claude/launch.json` の `docs` (python http.server 8767)。ツリーは見えている分しか描かれないので、
-  奥のリーフは URL `#/browse/dosurvey:root/dosurvey:folder:<measure>/dosurvey:map:<measure>:<key>` で開く。
+  奥のリーフは URL `#/browse/dosurvey:root/dosurvey:map:range` や
+  `#/browse/dosurvey:root/dosurvey:folder:years/dosurvey:map:year:<年度>` で開く。
 - 画面に出典 (国土地理院) と、dwg7 が加工したことを必ず出す (概要ビューと各地図の注記)。
 
 ## 出典表記

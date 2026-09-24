@@ -12,9 +12,9 @@ GeoParquet にまとめる。これを元に、「測量地域 市区町村」�
 python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 ```
 
-左のツリー「北海道の公共測量」を開き、「関与件数」「按分件数」から令和・全期間・各年度を選ぶと、
-市町村ごとの件数で [tabularmaps/do](https://github.com/tabularmaps/do) の 16×16 表形式地図が塗られる
-(6 段の順序尺度。セルに触れると正確な件数と主な計画機関)。ルートを選ぶと年度ごとの件数の概要。
+左のツリー「北海道の公共測量」を開き、「期間を選んで見る」でスライダーの 2 つのつまみで年度の範囲を選ぶか、
+「年度別」から年度を選ぶと、市町村ごとの件数で [tabularmaps/do](https://github.com/tabularmaps/do) の 16×16 表形式地図が
+塗られる (6 段の順序尺度。セルに触れると件数と主な計画機関)。ルートを選ぶと年度ごとの件数の概要。
 
 ## データ
 
@@ -26,15 +26,14 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 列の定義、CSV・API の項目との対応、読み替えの規則は [SCHEMA.md](SCHEMA.md)。
 
 ```sql
--- duckdb: 令和 (受付年度 2019〜) に関与件数の多い市町村
+-- duckdb: 受付年度 2019〜 に件数の多い市町村
 LOAD spatial;
 SELECT code, count(*) AS n
 FROM (SELECT unnest(muni_codes) AS code FROM 'data/surveys.parquet' WHERE year >= 2019)
 GROUP BY code ORDER BY n DESC LIMIT 10;
 ```
 
-複数の市町村にまたがる測量は、関与した各市町村に 1 件ずつ数える「関与件数」を主、1/関与市町村数ずつ按分する
-「按分件数」を補助とする (DECISIONS.md D3)。
+件数は、測量が関わった市町村それぞれに 1 件と数える (複数の市町村にまたがる測量は各市町村に 1 件。DECISIONS.md D11)。
 
 ## 作り直す
 

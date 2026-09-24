@@ -5,13 +5,13 @@
  * 構成 (dwg7/cafebabe の Open MCT 実地ノウハウに従う):
  *   - objects.addProvider + composition.addProvider + objectViews.addProvider だけを使う。Telemetry API は使わない。
  *   - ルートは独自 type 'dosurvey.root' にして概要ビューだけを紐付ける (既定の Grid View と競合させない)。
- *   - フォルダは組み込みの 'folder'。指標 (リーフ) は独自 type 'dosurvey.map' に tabular map ビューを紐付ける。
- *   - 年度は 1 リーフ = 1 年度 (切替 UI を作らず、ツリーを選択 UI として使う)。
+ *   - フォルダは組み込みの 'folder'。地図 (リーフ) は独自 type 'dosurvey.map' に tabular map ビューを紐付ける。
+ *   - 値は件数だけ (測量が関わった市町村それぞれに 1 件。按分件数は使わない。D11)。
  *
  * ツリー:
  *   北海道の公共測量 (概要: 年度別の件数)
- *     関与件数 / 按分件数
- *       令和 (2019〜) / 全期間 / 各年度 (新しい順)
+ *     期間を選んで見る (年度の範囲を 2 つのつまみで選ぶ)
+ *     年度別 / 各年度 (新しい順)
  *
  * 描画は vendor/do/tabularmap.js (TabularMap.create) をそのまま使う。
  */
@@ -23,24 +23,25 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
 
   const SOURCE_NOTE = '出典: 国土地理院ウェブサイト「公共測量実施情報」(https://psgsv4.gsi.go.jp/giaSearch/) を dwg7 が加工して作成';
 
-  // 段階 (順序尺度)。件数の分布が強く偏るので線形ではなく固定の区切りで塗る (DECISIONS.md D10)。
-  // 期間の長さで区切りを変えるが、同じ長さの期間どうし (年度どうし) は同じ区切りで比べられる。
-  const BREAKS = {
-    year: [0, 1, 2, 5, 10, 20],
-    reiwa: [0, 1, 10, 25, 50, 100],
-    all: [0, 1, 50, 100, 200, 400]
-  };
+  // 段階 (順序尺度)。件数の分布が強く偏るので線形ではなく区切りで塗る (D10)。
+  // 区切りは選んだ年数 n で伸縮させる: 1 年度 = 0/1/2/5/10/20 を基準に、2 番目以降を n^0.8 倍して有効数字 2 桁に丸める
+  // (8 年度 = 0/1/11/26/53/110、44 年度 = 0/1/41/100/210/410)。区切りの比が年数によらず揃う。同じ年数の期間どうしは同じ区切りで比べられる (D11)。
+  const BASE = [2, 5, 10, 20];
   // tabularmaps/do の SEQ ランプ (tabularmap.js) から 6 段を採る
   const COLORS = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#1c5cab', '#0d366b'];
 
-  const MEASURES = [
-    { key: 'involved', name: '関与件数', label: '関与件数',
-      about: '測量が関与した市町村それぞれに 1 件と数える (複数の市町村にまたがる測量は各市町村に 1 件)' },
-    { key: 'apportioned', name: '按分件数', label: '按分件数',
-      about: '1 件を関与した市町村の数で等分して数える (道全体の合計が測量件数と一致する)' }
-  ];
-
-  function breaksFor(key) { return key === 'reiwa' ? BREAKS.reiwa : key === 'all' ? BREAKS.all : BREAKS.year; }
+  function round2(x) {   // 有効数字 2 桁
+    const e = Math.pow(10, Math.max(0, Math.floor(Math.log10(x)) - 1));
+    return Math.round(x / e) * e;
+  }
+  function breaksFor(n) {
+    const f = Math.pow(n, 0.8), br = [0, 1];
+    for (const b of BASE) {
+      const v = round2(b * f);
+      if (v > br[br.length - 1]) br.push(v);
+    }
+    return br;
+  }
   function classOf(v, br) {
     let k = 0;
     for (let i = 0; i < br.length; i++) if (v >= br[i]) k = i;
@@ -54,12 +55,7 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
     }
     return labels;
   }
-  function fmtNum(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
-  function periodName(key, meta) {
-    if (key === 'reiwa') return `令和 (${meta.from}〜${meta.to} 年度)`;
-    if (key === 'all') return `全期間 (${meta.from}〜${meta.to} 年度)`;
-    return `${key} 年度`;
-  }
+  function rangeName(y0, y1) { return y0 === y1 ? `${y0} 年度` : `${y0}〜${y1} 年度`; }
 
   const cache = new Map();
   function getJson(url) {
@@ -69,34 +65,44 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
   function loadBase() {
     return Promise.all([
       getJson(doDataUrl + 'layout-v08.json'), getJson(doDataUrl + 'municipalities.json'),
-      getJson(doDataUrl + 'sapporo-wards.json'), getJson(dataUrl + 'summary.json')
-    ]).then(([layout, municipalities, wards, summary]) => ({ layout, municipalities, wards, summary }));
+      getJson(doDataUrl + 'sapporo-wards.json'), getJson(dataUrl + 'summary.json'), getJson(dataUrl + 'matrix.json')
+    ]).then(([layout, municipalities, wards, summary, matrix]) => ({ layout, municipalities, wards, summary, matrix }));
   }
 
-  // 1 リーフ分の series を作る。値は段階の番号、正確な件数と主な計画機関は notes に入れる。
-  async function buildSeries(measure, key, summary, municipalities) {
-    const d = await getJson(`${dataUrl}series/${key}.json`);
-    const br = breaksFor(key);
-    const values = {}, notes = {};
-    const current = summary.years[summary.years.length - 1].year;
+  // 年度範囲 [y0, y1] の series を作る。値は段階の番号、正確な件数と主な計画機関は notes に入れる。
+  function buildSeries(base, y0, y1) {
+    const { matrix, summary, municipalities } = base;
+    const i0 = matrix.years.indexOf(y0), i1 = matrix.years.indexOf(y1);
+    const br = breaksFor(y1 - y0 + 1);
+    const values = {}, notes = {}, tips = {};
     for (const m of municipalities.municipalities) {
       if (m.status !== 'active') continue;   // 根室振興局管内の 6 村は照合対象外なので無データのまま
-      const inv = d.involved[m.code] || 0, app = d.apportioned[m.code] || 0;
-      const v = measure.key === 'involved' ? inv : app;
-      values[m.code] = classOf(v, br);
-      const top = (d.topPlanners[m.code] || []).map(([p, n]) => `${p} ${n}`).join('、');
-      notes[m.code] = `関与 ${inv} 件 · 按分 ${fmtNum(app)} 件` + (top ? ` · 主な計画機関: ${top}` : '');
+      const row = matrix.involved[m.code] || [];
+      let n = 0;
+      for (let i = i0; i <= i1; i++) n += row[i] || 0;
+      values[m.code] = classOf(n, br);
+      const pc = new Map();
+      for (const [yi, pi, c] of matrix.plannerCounts[m.code] || []) if (yi >= i0 && yi <= i1) pc.set(pi, (pc.get(pi) || 0) + c);
+      const top = [...pc.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 3)
+        .map(([pi, c]) => [matrix.planners[pi], c]);
+      notes[m.code] = `${n} 件` + (top.length ? ' · ' + top.map(([p, c]) => `${p} ${c}`).join('、') : '');
+      tips[m.code] = { name: m.fullName, n, top };
     }
-    const partial = d.to === current ? ` (${summary.lastReceptDate} 受付分まで)` : '';
+    const surveys = summary.years.filter((y) => y.year >= y0 && y.year <= y1).reduce((a, y) => a + y.surveys, 0);
+    const last = summary.years[summary.years.length - 1].year;
+    const partial = y1 === last ? ` (${summary.lastReceptDate} 受付分まで)` : '';
     return {
-      label: `${measure.label} · ${periodName(key, d)}`,
+      label: `件数 · ${rangeName(y0, y1)}`,
       unit: '件',
-      asOf: `測量 ${d.surveys.toLocaleString('ja-JP')} 件${partial}`,
+      asOf: `測量 ${surveys.toLocaleString('ja-JP')} 件${partial}`,
       min: 0, max: br.length - 1,
-      values, notes,
+      values, notes, tips,
       scale: { type: 'ordinal', labels: classLabels(br), colors: Object.fromEntries(COLORS.map((c, i) => [String(i), c])) }
     };
   }
+
+  const ABOUT = '件数は、測量が関わった市町村それぞれに 1 件と数えます (複数の市町村にまたがる測量は各市町村に 1 件)。' +
+    'セルに触れると件数と主な計画機関 (上位 3)、「表で見る」で一覧。東端の列の 6 村は北方領土の村で、照合の対象外 (無データ)。';
 
   return function install(openmct) {
     openmct.types.addType('dosurvey.root', { name: '公共測量の概要', description: '北海道の公共測量の概要', creatable: false, cssClass: 'icon-dataset' });
@@ -111,18 +117,14 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
     }
 
     const ready = getJson(dataUrl + 'summary.json').then((summary) => {
+      const last = summary.years[summary.years.length - 1].year;
       add('root', { name: '北海道の公共測量', type: 'dosurvey.root', location: 'ROOT' });
       compositions.set('root', []);
-      const keys = ['reiwa', 'all', ...summary.years.map((y) => String(y.year)).reverse()];
-      for (const m of MEASURES) {
-        const fk = 'folder:' + m.key;
-        compositions.set(fk, []);
-        add(fk, { name: m.name, type: 'folder' }, 'root');
-        for (const k of keys) {
-          const meta = summary.keys[k];
-          add(`map:${m.key}:${k}`, { name: periodName(k, meta) + (k === String(summary.years[summary.years.length - 1].year) ? ' (途中)' : ''),
-                                     type: 'dosurvey.map', dosurvey: { measure: m.key, key: k } }, fk);
-        }
+      add('map:range', { name: '期間を選んで見る', type: 'dosurvey.map', dosurvey: { range: true } }, 'root');
+      compositions.set('folder:years', []);
+      add('folder:years', { name: '年度別', type: 'folder' }, 'root');
+      for (const y of summary.years.map((d) => d.year).reverse()) {
+        add(`map:year:${y}`, { name: `${y} 年度` + (y === last ? ' (途中)' : ''), type: 'dosurvey.map', dosurvey: { year: y } }, 'folder:years');
       }
     });
 
@@ -152,20 +154,32 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
             host = document.createElement('div');
             host.className = 'tm-openmct-host ds-host';
             element.appendChild(host);
-            loadBase().then(async (base) => {
+            loadBase().then((base) => {
               if (disposed) return;
-              const measure = MEASURES.find((m) => m.key === domainObject.dosurvey.measure);
+              const years = base.matrix.years;
+              const opt = domainObject.dosurvey;
+              let y0 = opt.range ? years[0] : opt.year, y1 = opt.range ? years[years.length - 1] : opt.year;
+              if (opt.range) host.appendChild(rangeControl(years, (a, b) => { y0 = a; y1 = b; repaint(); }));
               map = window.TabularMap.create(host, {
                 layout: base.layout, municipalities: base.municipalities, wards: base.wards,
                 mode: 'region', title: domainObject.name, includeNorthernTerritoriesVillages: true
               });
-              const series = await buildSeries(measure, domainObject.dosurvey.key, base.summary, base.municipalities);
-              if (disposed) return;
-              map.setSeries(series);
+              let series = null;
+              const repaint = () => { if (!disposed) { series = buildSeries(base, y0, y1); map.setSeries(series); } };
+              repaint();
+              // マウスオーバーは「件数」と「計画機関」だけにする (D11)。描画コアのツールチップの中身を差し替える。
+              host.addEventListener('mousemove', (ev) => {
+                const cell = ev.target.closest && ev.target.closest('.tm-cell[data-code]');
+                const tip = host.querySelector('.tm-tip');
+                const t = cell && series && series.tips[cell.getAttribute('data-code')];
+                if (!t || !tip || tip.hidden) return;
+                tip.innerHTML = `<b>${t.name}</b><span class="tm-tip-val">件数 ${t.n} 件</span>` +
+                  (t.top.length ? `<span class="tm-tip-sub">計画機関</span>` +
+                    t.top.map(([p, c]) => `<span class="tm-tip-sub">${p} ${c} 件</span>`).join('') : '');
+              });
               const note = document.createElement('div');
               note.className = 'tm-openmct-note';
-              note.textContent = `${measure.about}。セルに触れると正確な件数と主な計画機関が出ます。「表で見る」で一覧。` +
-                `東端の列の 6 村は北方領土の村で、照合の対象外 (無データ)。${SOURCE_NOTE}`;
+              note.textContent = ABOUT + SOURCE_NOTE;
               host.appendChild(note);
             }).catch((e) => { if (host) host.textContent = 'データを読めませんでした: ' + e.message; });
           },
@@ -198,19 +212,47 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
     });
   };
 
+  // 年度範囲のスライダー (2 つのつまみ)。
+  function rangeControl(years, onChange) {
+    const lo = years[0], hi = years[years.length - 1];
+    const wrap = document.createElement('div');
+    wrap.className = 'ds-range';
+    wrap.innerHTML = `<div class="ds-range-label"><span class="ds-range-v"></span>
+        <button type="button" class="ds-range-all">全期間に戻す</button></div>
+      <div class="ds-range-track"><div class="ds-range-fill"></div>
+        <input type="range" class="ds-range-a" min="${lo}" max="${hi}" step="1" value="${lo}" aria-label="開始年度">
+        <input type="range" class="ds-range-b" min="${lo}" max="${hi}" step="1" value="${hi}" aria-label="終了年度"></div>
+      <div class="ds-range-ends"><span>${lo}</span><span>${hi}</span></div>`;
+    const a = wrap.querySelector('.ds-range-a'), b = wrap.querySelector('.ds-range-b');
+    const v = wrap.querySelector('.ds-range-v'), fill = wrap.querySelector('.ds-range-fill');
+    function update(fromA, notify = true) {
+      let x = +a.value, y = +b.value;
+      if (x > y) { if (fromA) { y = x; b.value = y; } else { x = y; a.value = x; } }
+      v.textContent = x === y ? `${x} 年度 (1 年度)` : `${x}〜${y} 年度 (${y - x + 1} 年度)`;
+      fill.style.left = ((x - lo) / (hi - lo) * 100) + '%';
+      fill.style.right = ((hi - y) / (hi - lo) * 100) + '%';
+      if (notify) onChange(x, y);   // 179 セルの塗り直しは十分軽いので、動かしている間も直接呼ぶ
+    }
+    a.addEventListener('input', () => update(true));
+    b.addEventListener('input', () => update(false));
+    wrap.querySelector('.ds-range-all').addEventListener('click', () => { a.value = lo; b.value = hi; update(true); });
+    update(true, false);   // 初期表示は呼び出し側が描く
+    return wrap;
+  }
+
   function renderOverview(host, s) {
     const total = s.years.reduce((a, y) => a + y.surveys, 0);
-    const reiwa = s.years.filter((y) => y.year >= s.reiwaFirstYear).reduce((a, y) => a + y.surveys, 0);
+    const withRegion = s.years.reduce((a, y) => a + y.withRegion, 0);
     host.innerHTML = `
       <h2 class="ds-h">北海道の公共測量 <span class="ds-sub">${s.section}</span></h2>
       <div class="ds-tiles">
         <div class="ds-tile"><div class="ds-tile-v">${total.toLocaleString('ja-JP')}</div><div class="ds-tile-k">全期間の測量件数 (${s.years[0].year}〜${s.years[s.years.length - 1].year} 年度)</div></div>
-        <div class="ds-tile"><div class="ds-tile-v">${reiwa.toLocaleString('ja-JP')}</div><div class="ds-tile-k">令和 (${s.reiwaFirstYear} 年度〜) の測量件数</div></div>
+        <div class="ds-tile"><div class="ds-tile-v">${withRegion.toLocaleString('ja-JP')}</div><div class="ds-tile-k">うち実施地域図のある測量 (2004 年度〜)</div></div>
         <div class="ds-tile"><div class="ds-tile-v">${s.lastReceptDate}</div><div class="ds-tile-k">最新の受付日 (取得 ${s.fetchedAt.slice(0, 10)})</div></div>
       </div>
       <div class="ds-chart-title">受付年度ごとの測量件数</div>
       <div class="ds-chart"></div>
-      <p class="ds-text">左のツリーの「関与件数」「按分件数」から期間を選ぶと、市町村ごとの件数で 16×16 の表形式地図
+      <p class="ds-text">左のツリーの「期間を選んで見る」で年度の範囲を選ぶか、「年度別」から年度を選ぶと、市町村ごとの件数で 16×16 の表形式地図
         (<a href="https://github.com/tabularmaps/do" target="_blank" rel="noopener">tabularmaps/do</a>) が塗られます。
         受付年度は 4 月〜翌 3 月。合併前の旧町村名・札幌市の区名は現在の市町村に読み替えています
         (<a href="https://github.com/dwg7/do-survey/blob/main/SCHEMA.md" target="_blank" rel="noopener">読み替え表</a>)。
@@ -222,7 +264,7 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
     drawBars(host.querySelector('.ds-chart'), s);
   }
 
-  // 1 系列の縦棒。令和の期間は背景の帯とラベルで示す (色で系列を分けない)。
+  // 1 系列の縦棒。
   function drawBars(el, s) {
     const W = 760, H = 240, m = { l: 40, r: 8, t: 18, b: 26 };
     const ys = s.years, n = ys.length;
@@ -238,11 +280,6 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
     svg.setAttribute('role', 'img');
     svg.setAttribute('aria-label', '受付年度ごとの測量件数');
     const mk = (tag, attrs, parent) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
-    const ri = ys.findIndex((d) => d.year >= s.reiwaFirstYear);
-    if (ri >= 0) {
-      mk('rect', { x: x(ri), y: m.t - 14, width: W - m.r - x(ri), height: H - m.b - m.t + 14, class: 'ds-band' });
-      mk('text', { x: x(ri) + 4, y: m.t - 4, class: 'ds-band-label' }).textContent = '令和';
-    }
     for (let v = 0; v <= top; v += 200) {
       mk('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), class: v === 0 ? 'ds-base' : 'ds-grid' });
       mk('text', { x: m.l - 6, y: y(v) + 4, class: 'ds-axis', 'text-anchor': 'end' }).textContent = v;

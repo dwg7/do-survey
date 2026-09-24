@@ -7,7 +7,7 @@
 
 出力:
   data/surveys.parquet               GeoParquet。測量 1 件 = 1 行 (geometry は実施地域図のポリゴン、EPSG:4326)
-  docs/data/series/<key>.json        ダッシュボード用の市町村ごとの集計 (令和・全期間・各年度)
+  docs/data/matrix.json              ダッシュボード用の受付年度 × 市町村の関与件数 (計画機関別の内訳付き)
   docs/data/summary.json             年度ごとの件数など
 
 変換に duckdb CLI (spatial 拡張) を使う。
@@ -17,12 +17,12 @@ import csv
 import json
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-REIWA_FIRST_YEAR = 2019
 ALIASES = ROOT / 'data/name-aliases.csv'
 MUNIS = ROOT / 'docs/vendor/do/data/municipalities.json'
 
@@ -78,7 +78,7 @@ def main():
                 elif c not in codes:
                     codes.append(c)
             for c in codes:
-                links.append({'survey_id': it['id'], 'muni_code': c, 'share': 1 / len(codes), 'year': d['year']})
+                links.append({'survey_id': it['id'], 'muni_code': c, 'year': d['year']})
             term = split_br(it['term'])
             # 冗長なキーは一致を確かめてから捨てる (SCHEMA.md「取り込まないキー」)
             assert it['yearRecept'] == d['year'] and it['jogenID'] == it['articleID']
@@ -141,52 +141,45 @@ COPY (
 
 
 def write_dashboard_data(rows, links, unresolved):
-    """docs/data/ にダッシュボード用の集計を書く (D10)。
+    """docs/data/ にダッシュボード用の集計を書く (D10, D11)。
 
-    series/<key>.json: key = 'reiwa' | 'all' | '<受付年度>'。市町村ごとの関与件数・按分件数・主な計画機関。
-    summary.json: 年度ごとの測量件数と、各 key の期間・件数。
+    matrix.json: 受付年度 × 市町村の関与件数と、年度 × 市町村 × 計画機関の件数。
+      ブラウザ側で任意の年度範囲を合算する (期間スライダー)。
+    summary.json: 年度ごとの測量件数など。
     """
     by_id = {r['survey_id']: r for r in rows}
-    years = sorted({r['year'] for r in rows})
-    periods = {'reiwa': (REIWA_FIRST_YEAR, years[-1]), 'all': (years[0], years[-1])}
-    periods.update({str(y): (y, y) for y in years})
-    out = ROOT / 'docs/data/series'
-    out.mkdir(parents=True, exist_ok=True)
-    for old in out.glob('*.json'):
-        old.unlink()
-    summary_keys = {}
-    for key, (y0, y1) in periods.items():
-        inv, app = collections.Counter(), collections.defaultdict(float)
-        planners = collections.defaultdict(collections.Counter)
-        for l in links:
-            if y0 <= l['year'] <= y1:
-                inv[l['muni_code']] += 1
-                app[l['muni_code']] += l['share']
-                planners[l['muni_code']][by_id[l['survey_id']]['planner']] += 1
-        n = sum(1 for r in rows if y0 <= r['year'] <= y1)
-        (out / f'{key}.json').write_text(json.dumps({
-            'key': key, 'from': y0, 'to': y1, 'surveys': n,
-            'involved': dict(sorted(inv.items())),
-            'apportioned': {c: round(v, 3) for c, v in sorted(app.items())},
-            'topPlanners': {c: pc.most_common(3) for c, pc in sorted(planners.items())},
-        }, ensure_ascii=False, separators=(',', ':')) + '\n')
-        summary_keys[key] = {'from': y0, 'to': y1, 'surveys': n}
+    years = list(range(min(r['year'] for r in rows), max(r['year'] for r in rows) + 1))
+    yi = {y: i for i, y in enumerate(years)}
+    counts = collections.defaultdict(lambda: [0] * len(years))
+    cp = collections.Counter()
+    for l in links:
+        counts[l['muni_code']][yi[l['year']]] += 1
+        cp[(l['muni_code'], yi[l['year']], by_id[l['survey_id']]['planner'])] += 1
+    planners = sorted({k[2] for k in cp})
+    pi = {p: i for i, p in enumerate(planners)}
+    by_code = collections.defaultdict(list)
+    for (code, y, p), n in sorted(cp.items()):
+        by_code[code].append([y, pi[p], n])
+    data = ROOT / 'docs/data'
+    data.mkdir(parents=True, exist_ok=True)
+    (data / 'matrix.json').write_text(json.dumps({
+        'years': years,
+        'involved': dict(sorted(counts.items())),
+        'planners': planners,
+        'plannerCounts': dict(sorted(by_code.items())),
+    }, ensure_ascii=False, separators=(',', ':')) + '\n')
     per_year = collections.Counter(r['year'] for r in rows)
     geo_year = collections.Counter(r['year'] for r in rows if r['geom'])
-    (ROOT / 'docs/data/summary.json').write_text(json.dumps({
+    (data / 'summary.json').write_text(json.dumps({
         'source': '国土地理院「公共測量実施情報」',
         'sourceUrl': 'https://psgsv4.gsi.go.jp/giaSearch/',
         'section': 'A 北海道地方測量部',
         'fetchedAt': max(r['fetched_at'] for r in rows),
         'lastReceptDate': max(r['recept_date'] for r in rows if r['recept_date']),
-        'reiwaFirstYear': REIWA_FIRST_YEAR,
         'years': [{'year': y, 'surveys': per_year[y], 'withRegion': geo_year[y]} for y in years],
-        'keys': summary_keys,
         'unresolved': dict(unresolved.most_common()),
     }, ensure_ascii=False, indent=1) + '\n')
-    stale = ROOT / 'docs/data/counts.json'
-    if stale.exists():
-        stale.unlink()
+    shutil.rmtree(data / 'series', ignore_errors=True)   # D10 の旧形式 (期間ごとのファイル)
 
 
 if __name__ == '__main__':
