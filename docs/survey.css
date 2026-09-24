@@ -54,6 +54,8 @@
 .ds-range-ends { display: flex; justify-content: space-between; color: #898781; font-size: 10px; }
 
 /* ツールチップ: 計画機関を全部並べる (件数の多い順)。12 を超えたら 2 段組。 */
+/* background shorthand と CSS 変数の組み合わせが Edge で効かない場合の対策として background-color を明示する。 */
+.ds-host .tm-tip { background-color: var(--tm-ink, #fff); }
 .ds-host .tm-tip.ds-tip { max-width: min(560px, 90%); }
 .ds-tip-planners { list-style: none; margin: 2px 0 0; padding: 0; font-size: 11px; }
 .ds-tip-planners li { display: flex; justify-content: space-between; gap: 10px; break-inside: avoid; }
