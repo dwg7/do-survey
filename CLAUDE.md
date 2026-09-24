@@ -15,12 +15,13 @@
 1. `scripts/fetch.py`: `POST /giaSearch/RegionMapsSearch` を受付年度ごとにページ送り (200 件/ページ、1 秒間隔) で取得し、
    `data/raw/A-<年度>.json` に保存。CSV ダウンロードは使わない (1,000 件上限、ダイアログ)。公開サービスなので
    CI で定期再取得しない。手動で実行する。
-2. `scripts/build.py`: 正規化して `data/surveys.parquet` (GeoParquet 1.0.0) と `docs/data/counts.json` を作る。
+2. `scripts/build.py`: 正規化して `data/surveys.parquet` (GeoParquet 1.0.0) と、ダッシュボード用の
+   `docs/data/series/<key>.json` (key = reiwa / all / 受付年度)・`docs/data/summary.json` を作る。
    冗長なキーは一致を assert してから捨てる。読み替えできない名前があっても止めず、`unresolved_names` に残す。
 
 ## コミットするもの
 
-- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、ドキュメント。
+- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、ドキュメント。
 - しない: `data/raw/` (27MB、`fetch.py` で再現できる)。
 
 ## 市町村の照合
@@ -37,6 +38,18 @@
 - 按分件数 (補助): 1/関与市町村数ずつ。道全体の合計が測量件数と一致する。
 - 受付年度 (`year`) は 4 月〜翌 3 月。当年度は途中。
 
+## ダッシュボード (docs/)
+
+- `docs/survey-plugin.js` が Open MCT のツリーを作る。objects / composition / objectViews の provider だけを使い、
+  Telemetry API は使わない。ルートは独自 type `dosurvey.root` (概要ビュー)、その下に組み込み `folder` の
+  「関与件数」「按分件数」、その下に令和・全期間・各年度 (新しい順) のリーフ `dosurvey.map`。
+- 描画は `docs/vendor/do/tabularmap.js` の `TabularMap.create`。値は段階の番号 (順序尺度 6 段、区切りは期間の長さで
+  単年度・令和・全期間の 3 種)、正確な件数と主な計画機関は `notes`。区切りを変えたら DECISIONS に書く。
+- Open MCT は unpkg の 4.3.1 に固定 (tabularmaps/do と同じ)。`window.SharedWorker = undefined` を先に置く。
+- ローカル確認は `.claude/launch.json` の `docs` (python http.server 8767)。ツリーは見えている分しか描かれないので、
+  奥のリーフは URL `#/browse/dosurvey:root/dosurvey:folder:<measure>/dosurvey:map:<measure>:<key>` で開く。
+- 画面に出典 (国土地理院) と、dwg7 が加工したことを必ず出す (概要ビューと各地図の注記)。
+
 ## 出典表記
 
 公共データ利用規約 (第 1.0 版) に従い、「出典: 国土地理院ウェブサイト「公共測量実施情報」 (URL)」と、
@@ -45,7 +58,8 @@ dwg7 が編集・加工したことを併記する。加工したデータを国
 ## tabularmaps/do の取り込み
 
 `docs/vendor/do/` に複製する (submodule・実行時の直接読み込みはしない。dwg7/cafebabe `patterns/interoperability.md`)。
-複製元のコミットを README に記録し、更新する時は同じコミットで書き換える。
+複製元のコミットを README に記録し、更新する時は同じコミットで書き換える。複製したファイルには手を入れない
+(do の `openmct-plugin.js` は複製していない。ツリーは `survey-plugin.js` で作る)。
 
 ## 言語・コミット
 

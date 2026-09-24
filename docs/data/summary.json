@@ -1,0 +1,466 @@
+{
+ "source": "国土地理院「公共測量実施情報」",
+ "sourceUrl": "https://psgsv4.gsi.go.jp/giaSearch/",
+ "section": "A 北海道地方測量部",
+ "fetchedAt": "2026-09-24T12:37:05+00:00",
+ "lastReceptDate": "2026-09-17",
+ "reiwaFirstYear": 2019,
+ "years": [
+  {
+   "year": 1983,
+   "surveys": 2,
+   "withRegion": 0
+  },
+  {
+   "year": 1984,
+   "surveys": 65,
+   "withRegion": 0
+  },
+  {
+   "year": 1985,
+   "surveys": 45,
+   "withRegion": 0
+  },
+  {
+   "year": 1986,
+   "surveys": 40,
+   "withRegion": 0
+  },
+  {
+   "year": 1987,
+   "surveys": 62,
+   "withRegion": 0
+  },
+  {
+   "year": 1988,
+   "surveys": 136,
+   "withRegion": 0
+  },
+  {
+   "year": 1989,
+   "surveys": 162,
+   "withRegion": 0
+  },
+  {
+   "year": 1990,
+   "surveys": 112,
+   "withRegion": 0
+  },
+  {
+   "year": 1991,
+   "surveys": 95,
+   "withRegion": 0
+  },
+  {
+   "year": 1992,
+   "surveys": 84,
+   "withRegion": 0
+  },
+  {
+   "year": 1993,
+   "surveys": 114,
+   "withRegion": 0
+  },
+  {
+   "year": 1994,
+   "surveys": 133,
+   "withRegion": 0
+  },
+  {
+   "year": 1995,
+   "surveys": 122,
+   "withRegion": 0
+  },
+  {
+   "year": 1996,
+   "surveys": 210,
+   "withRegion": 0
+  },
+  {
+   "year": 1997,
+   "surveys": 274,
+   "withRegion": 0
+  },
+  {
+   "year": 1998,
+   "surveys": 212,
+   "withRegion": 0
+  },
+  {
+   "year": 1999,
+   "surveys": 263,
+   "withRegion": 0
+  },
+  {
+   "year": 2000,
+   "surveys": 262,
+   "withRegion": 0
+  },
+  {
+   "year": 2001,
+   "surveys": 289,
+   "withRegion": 0
+  },
+  {
+   "year": 2002,
+   "surveys": 428,
+   "withRegion": 0
+  },
+  {
+   "year": 2003,
+   "surveys": 469,
+   "withRegion": 0
+  },
+  {
+   "year": 2004,
+   "surveys": 410,
+   "withRegion": 364
+  },
+  {
+   "year": 2005,
+   "surveys": 536,
+   "withRegion": 445
+  },
+  {
+   "year": 2006,
+   "surveys": 581,
+   "withRegion": 440
+  },
+  {
+   "year": 2007,
+   "surveys": 477,
+   "withRegion": 405
+  },
+  {
+   "year": 2008,
+   "surveys": 515,
+   "withRegion": 463
+  },
+  {
+   "year": 2009,
+   "surveys": 684,
+   "withRegion": 639
+  },
+  {
+   "year": 2010,
+   "surveys": 433,
+   "withRegion": 415
+  },
+  {
+   "year": 2011,
+   "surveys": 564,
+   "withRegion": 531
+  },
+  {
+   "year": 2012,
+   "surveys": 637,
+   "withRegion": 624
+  },
+  {
+   "year": 2013,
+   "surveys": 720,
+   "withRegion": 719
+  },
+  {
+   "year": 2014,
+   "surveys": 628,
+   "withRegion": 622
+  },
+  {
+   "year": 2015,
+   "surveys": 523,
+   "withRegion": 522
+  },
+  {
+   "year": 2016,
+   "surveys": 610,
+   "withRegion": 610
+  },
+  {
+   "year": 2017,
+   "surveys": 577,
+   "withRegion": 577
+  },
+  {
+   "year": 2018,
+   "surveys": 593,
+   "withRegion": 593
+  },
+  {
+   "year": 2019,
+   "surveys": 687,
+   "withRegion": 687
+  },
+  {
+   "year": 2020,
+   "surveys": 630,
+   "withRegion": 630
+  },
+  {
+   "year": 2021,
+   "surveys": 627,
+   "withRegion": 627
+  },
+  {
+   "year": 2022,
+   "surveys": 621,
+   "withRegion": 621
+  },
+  {
+   "year": 2023,
+   "surveys": 659,
+   "withRegion": 659
+  },
+  {
+   "year": 2024,
+   "surveys": 782,
+   "withRegion": 781
+  },
+  {
+   "year": 2025,
+   "surveys": 812,
+   "withRegion": 811
+  },
+  {
+   "year": 2026,
+   "surveys": 629,
+   "withRegion": 506
+  }
+ ],
+ "keys": {
+  "reiwa": {
+   "from": 2019,
+   "to": 2026,
+   "surveys": 5447
+  },
+  "all": {
+   "from": 1983,
+   "to": 2026,
+   "surveys": 17514
+  },
+  "1983": {
+   "from": 1983,
+   "to": 1983,
+   "surveys": 2
+  },
+  "1984": {
+   "from": 1984,
+   "to": 1984,
+   "surveys": 65
+  },
+  "1985": {
+   "from": 1985,
+   "to": 1985,
+   "surveys": 45
+  },
+  "1986": {
+   "from": 1986,
+   "to": 1986,
+   "surveys": 40
+  },
+  "1987": {
+   "from": 1987,
+   "to": 1987,
+   "surveys": 62
+  },
+  "1988": {
+   "from": 1988,
+   "to": 1988,
+   "surveys": 136
+  },
+  "1989": {
+   "from": 1989,
+   "to": 1989,
+   "surveys": 162
+  },
+  "1990": {
+   "from": 1990,
+   "to": 1990,
+   "surveys": 112
+  },
+  "1991": {
+   "from": 1991,
+   "to": 1991,
+   "surveys": 95
+  },
+  "1992": {
+   "from": 1992,
+   "to": 1992,
+   "surveys": 84
+  },
+  "1993": {
+   "from": 1993,
+   "to": 1993,
+   "surveys": 114
+  },
+  "1994": {
+   "from": 1994,
+   "to": 1994,
+   "surveys": 133
+  },
+  "1995": {
+   "from": 1995,
+   "to": 1995,
+   "surveys": 122
+  },
+  "1996": {
+   "from": 1996,
+   "to": 1996,
+   "surveys": 210
+  },
+  "1997": {
+   "from": 1997,
+   "to": 1997,
+   "surveys": 274
+  },
+  "1998": {
+   "from": 1998,
+   "to": 1998,
+   "surveys": 212
+  },
+  "1999": {
+   "from": 1999,
+   "to": 1999,
+   "surveys": 263
+  },
+  "2000": {
+   "from": 2000,
+   "to": 2000,
+   "surveys": 262
+  },
+  "2001": {
+   "from": 2001,
+   "to": 2001,
+   "surveys": 289
+  },
+  "2002": {
+   "from": 2002,
+   "to": 2002,
+   "surveys": 428
+  },
+  "2003": {
+   "from": 2003,
+   "to": 2003,
+   "surveys": 469
+  },
+  "2004": {
+   "from": 2004,
+   "to": 2004,
+   "surveys": 410
+  },
+  "2005": {
+   "from": 2005,
+   "to": 2005,
+   "surveys": 536
+  },
+  "2006": {
+   "from": 2006,
+   "to": 2006,
+   "surveys": 581
+  },
+  "2007": {
+   "from": 2007,
+   "to": 2007,
+   "surveys": 477
+  },
+  "2008": {
+   "from": 2008,
+   "to": 2008,
+   "surveys": 515
+  },
+  "2009": {
+   "from": 2009,
+   "to": 2009,
+   "surveys": 684
+  },
+  "2010": {
+   "from": 2010,
+   "to": 2010,
+   "surveys": 433
+  },
+  "2011": {
+   "from": 2011,
+   "to": 2011,
+   "surveys": 564
+  },
+  "2012": {
+   "from": 2012,
+   "to": 2012,
+   "surveys": 637
+  },
+  "2013": {
+   "from": 2013,
+   "to": 2013,
+   "surveys": 720
+  },
+  "2014": {
+   "from": 2014,
+   "to": 2014,
+   "surveys": 628
+  },
+  "2015": {
+   "from": 2015,
+   "to": 2015,
+   "surveys": 523
+  },
+  "2016": {
+   "from": 2016,
+   "to": 2016,
+   "surveys": 610
+  },
+  "2017": {
+   "from": 2017,
+   "to": 2017,
+   "surveys": 577
+  },
+  "2018": {
+   "from": 2018,
+   "to": 2018,
+   "surveys": 593
+  },
+  "2019": {
+   "from": 2019,
+   "to": 2019,
+   "surveys": 687
+  },
+  "2020": {
+   "from": 2020,
+   "to": 2020,
+   "surveys": 630
+  },
+  "2021": {
+   "from": 2021,
+   "to": 2021,
+   "surveys": 627
+  },
+  "2022": {
+   "from": 2022,
+   "to": 2022,
+   "surveys": 621
+  },
+  "2023": {
+   "from": 2023,
+   "to": 2023,
+   "surveys": 659
+  },
+  "2024": {
+   "from": 2024,
+   "to": 2024,
+   "surveys": 782
+  },
+  "2025": {
+   "from": 2025,
+   "to": 2025,
+   "surveys": 812
+  },
+  "2026": {
+   "from": 2026,
+   "to": 2026,
+   "surveys": 629
+  }
+ },
+ "unresolved": {
+  "富良野町": 1,
+  "北海道": 1
+ }
+}

@@ -7,17 +7,14 @@
 
 - `data/surveys.parquet`: 受付年度 1983〜2026 の 17,514 件 (2026-09-24 取得、2026 年度は 9/17 受付分まで)。
   実施地域図のポリゴン 13,291 件。読み替えできない名前は 2 件 (`富良野町`、`北海道`)。
-- `docs/data/counts.json` (年度・令和・全期間 × 市町村の関与件数・按分件数) と `docs/vendor/do/` (tabularmaps/do@2439872
-  の描画コア・Open MCT プラグイン・配置データ) は作ってあるが、ダッシュボードと一緒にコミットするため未コミット。
-- ダッシュボードはまだ無い。hfu とチャットで統計を確認した段階 (令和の関与件数の上位: 帯広 193、旭川 164、札幌 164、
-  北見 148、深川 147)。
+- Open MCT ダッシュボード (`docs/`): 概要 (年度別件数の棒グラフ・出典) + 関与件数 / 按分件数 × 令和・全期間・各年度。
+  ローカルで表示と数値 (按分の合計) を確認済み。GitHub Pages (main の /docs) で公開。
 - dwg7/cafebabe の `PROJECTS.md` に登録済み。cafebabe への寄稿候補: 市区町村欄の複数値、1997〜2000 年度の区名の
-  「札幌市」脱落、GeoParquet の実地知見 (泊村の同名衝突は cafebabe が反映済み)。
+  「札幌市」脱落、GeoParquet の実地知見、公開 API の CSV ボタンの裏側を読む手法 (泊村の同名衝突は cafebabe が反映済み)。
 
 ## 次にやること
 
-1. Open MCT ダッシュボード (tabularmaps/do): 年度ごと + 令和 + 全期間をツリーのリーフとして並べる (cafebabe の助言)。
-   主は関与件数、補助に按分件数。GitHub Pages (main の /docs)。
-2. 実施地域図のポリゴンのビュー (bvmap-starlight の MapLibre GL JS)。別の機会に。
-3. GeoParquet をウェブから問い合わせる (DuckDB-WASM など) 経路の検討。
+1. 実施地域図のポリゴンのビュー (bvmap-starlight の MapLibre GL JS)。別の機会に。
+2. GeoParquet をウェブから問い合わせる (DuckDB-WASM など) 経路。Open MCT のビューから問い合わせる形を検討。
+3. 指標の追加候補: 測量種別別 (基準点測量・UAV 写真測量など)、計画機関の種類別 (開発局・道・市町村)。
 4. cafebabe への寄稿。

@@ -1,0 +1,38 @@
+/* do-survey の概要ビュー。色は tabularmaps/do の style.css のトークン (--tm-*) に揃える。
+   Open MCT の Espresso (暗色) の上で使うので .tm-dark の値を既定にする。 */
+.ds-overview {
+  --ds-surface: #1a1a19; --ds-ink: #ffffff; --ds-ink-2: #c3c2b7; --ds-muted: #898781; --ds-hairline: #2c2c2a;
+  --ds-bar: #6da7ec; --ds-bar-hover: #9ec5f4; --ds-band: rgba(109, 167, 236, 0.08);
+  color: var(--ds-ink); padding: 12px 16px; overflow: auto; height: 100%; box-sizing: border-box;
+  font-size: 13px; line-height: 1.6; max-width: 820px;
+}
+.ds-h { font-size: 18px; margin: 0 0 12px; font-weight: 600; }
+.ds-sub { font-size: 12px; color: var(--ds-muted); font-weight: 400; margin-left: 8px; }
+.ds-tiles { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.ds-tile { flex: 1 1 180px; border: 1px solid var(--ds-hairline); border-radius: 6px; padding: 8px 12px; }
+.ds-tile-v { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ds-tile-k { font-size: 11px; color: var(--ds-ink-2); }
+.ds-chart-title { font-size: 12px; color: var(--ds-ink-2); margin-bottom: 4px; }
+.ds-chart { position: relative; }
+.ds-svg { width: 100%; height: auto; display: block; }
+.ds-grid { stroke: var(--ds-hairline); stroke-width: 1; }
+.ds-base { stroke: var(--ds-muted); stroke-width: 1; }
+.ds-axis { fill: var(--ds-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.ds-band { fill: var(--ds-band); }
+.ds-band-label { fill: var(--ds-ink-2); font-size: 10px; }
+.ds-bar-fill { fill: var(--ds-bar); }
+.ds-bar.ds-hover .ds-bar-fill { fill: var(--ds-bar-hover); }
+.ds-tip {
+  position: absolute; pointer-events: none; background: var(--ds-ink); color: var(--ds-surface);
+  font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap;
+}
+.ds-tip span { color: #52514e; }
+.ds-table { margin-top: 8px; font-size: 12px; }
+.ds-table summary { cursor: pointer; color: var(--ds-ink-2); }
+.ds-table table { border-collapse: collapse; margin-top: 4px; }
+.ds-table th, .ds-table td { padding: 2px 10px; border-bottom: 1px solid var(--ds-hairline); text-align: left; }
+.ds-table .tm-num { text-align: right; font-variant-numeric: tabular-nums; }
+.ds-text { color: var(--ds-ink-2); font-size: 12px; margin-top: 16px; }
+.ds-credit { color: var(--ds-muted); font-size: 11px; }
+.ds-overview a { color: var(--ds-bar-hover); }
+.ds-host { height: 100%; overflow: auto; }

@@ -7,7 +7,8 @@
 
 出力:
   data/surveys.parquet               GeoParquet。測量 1 件 = 1 行 (geometry は実施地域図のポリゴン、EPSG:4326)
-  docs/data/counts.json              ダッシュボード用の年度 × 市町村の集計 (関与件数・按分件数)
+  docs/data/series/<key>.json        ダッシュボード用の市町村ごとの集計 (令和・全期間・各年度)
+  docs/data/summary.json             年度ごとの件数など
 
 変換に duckdb CLI (spatial 拡張) を使う。
 """
@@ -135,31 +136,57 @@ COPY (
 """
         subprocess.run(['duckdb', '-c', sql], check=True)
 
-    # ダッシュボード用の集計
-    counts = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0.0]))
-    for l in links:
-        keys = [str(l['year']), 'all'] + (['reiwa'] if l['year'] >= REIWA_FIRST_YEAR else [])
-        for key in keys:
-            c = counts[key][l['muni_code']]
-            c[0] += 1
-            c[1] += l['share']
+    write_dashboard_data(rows, links, unresolved)
+    print(f'surveys={len(rows)} links={len(links)} unresolved={dict(unresolved)}', file=sys.stderr)
+
+
+def write_dashboard_data(rows, links, unresolved):
+    """docs/data/ にダッシュボード用の集計を書く (D10)。
+
+    series/<key>.json: key = 'reiwa' | 'all' | '<受付年度>'。市町村ごとの関与件数・按分件数・主な計画機関。
+    summary.json: 年度ごとの測量件数と、各 key の期間・件数。
+    """
+    by_id = {r['survey_id']: r for r in rows}
     years = sorted({r['year'] for r in rows})
-    surveys_by_year = collections.Counter(r['year'] for r in rows)
-    doc = {
-        'source': '国土地理院「公共測量実施情報」 https://psgsv4.gsi.go.jp/giaSearch/',
+    periods = {'reiwa': (REIWA_FIRST_YEAR, years[-1]), 'all': (years[0], years[-1])}
+    periods.update({str(y): (y, y) for y in years})
+    out = ROOT / 'docs/data/series'
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob('*.json'):
+        old.unlink()
+    summary_keys = {}
+    for key, (y0, y1) in periods.items():
+        inv, app = collections.Counter(), collections.defaultdict(float)
+        planners = collections.defaultdict(collections.Counter)
+        for l in links:
+            if y0 <= l['year'] <= y1:
+                inv[l['muni_code']] += 1
+                app[l['muni_code']] += l['share']
+                planners[l['muni_code']][by_id[l['survey_id']]['planner']] += 1
+        n = sum(1 for r in rows if y0 <= r['year'] <= y1)
+        (out / f'{key}.json').write_text(json.dumps({
+            'key': key, 'from': y0, 'to': y1, 'surveys': n,
+            'involved': dict(sorted(inv.items())),
+            'apportioned': {c: round(v, 3) for c, v in sorted(app.items())},
+            'topPlanners': {c: pc.most_common(3) for c, pc in sorted(planners.items())},
+        }, ensure_ascii=False, separators=(',', ':')) + '\n')
+        summary_keys[key] = {'from': y0, 'to': y1, 'surveys': n}
+    per_year = collections.Counter(r['year'] for r in rows)
+    geo_year = collections.Counter(r['year'] for r in rows if r['geom'])
+    (ROOT / 'docs/data/summary.json').write_text(json.dumps({
+        'source': '国土地理院「公共測量実施情報」',
+        'sourceUrl': 'https://psgsv4.gsi.go.jp/giaSearch/',
         'section': 'A 北海道地方測量部',
         'fetchedAt': max(r['fetched_at'] for r in rows),
-        'years': years,
-        'surveys': {**{str(y): surveys_by_year[y] for y in years}, 'all': len(rows),
-                    'reiwa': sum(v for y, v in surveys_by_year.items() if y >= REIWA_FIRST_YEAR)},
+        'lastReceptDate': max(r['recept_date'] for r in rows if r['recept_date']),
+        'reiwaFirstYear': REIWA_FIRST_YEAR,
+        'years': [{'year': y, 'surveys': per_year[y], 'withRegion': geo_year[y]} for y in years],
+        'keys': summary_keys,
         'unresolved': dict(unresolved.most_common()),
-        'involved': {k: {code: v[0] for code, v in sorted(m.items())} for k, m in counts.items()},
-        'apportioned': {k: {code: round(v[1], 3) for code, v in sorted(m.items())} for k, m in counts.items()},
-    }
-    (ROOT / 'docs/data').mkdir(parents=True, exist_ok=True)
-    (ROOT / 'docs/data/counts.json').write_text(json.dumps(doc, ensure_ascii=False, indent=1) + '\n')
-    print(f'surveys={len(rows)} links={len(links)} years={years[0]}-{years[-1]} unresolved={dict(unresolved)}',
-          file=sys.stderr)
+    }, ensure_ascii=False, indent=1) + '\n')
+    stale = ROOT / 'docs/data/counts.json'
+    if stale.exists():
+        stale.unlink()
 
 
 if __name__ == '__main__':

@@ -71,3 +71,22 @@ hfu の指示で、データとしてコミットするのは `data/surveys.parq
 市町村名のビューは tabularmaps/do の Open MCT ダッシュボード、実施地域図のポリゴンのビューは bvmap-starlight の
 MapLibre GL JS とし、それぞれ別の機会に入れる (hfu)。GeoParquet を選んだのは、最終的に Open MCT を経由してウェブ上で
 問い合わせられるようにするため。
+
+## D10 (2026-09-24) Open MCT ダッシュボードの構成
+
+- tabularmaps/do の `openmct-plugin.js` は指標をルート直下に平たく並べる作りで、年度ごと 44 リーフ × 2 指標には向かない。
+  そこで do の描画コア (`TabularMap.create`) と配置データだけを `docs/vendor/do/` に複製し (tabularmaps/do@2439872)、
+  ツリーは自前の `docs/survey-plugin.js` で作る。複製した do のファイルには手を入れない。
+- ツリー: ルート (独自 type `dosurvey.root`、概要ビューだけを紐付ける) → 組み込み `folder` の「関与件数」「按分件数」→
+  令和・全期間・各年度 (新しい順) のリーフ (独自 type `dosurvey.map`)。1 リーフ = 1 期間で、年度の切り替えはツリーに任せる
+  (cafebabe の助言)。ルートを独自 type にするのは既定の Grid View をビュー切替に残さないため (cafebabe
+  `patterns/open-mct-object-model.md`、m3xx-fleet の実例)。
+- 塗りは順序尺度の 6 段。件数の分布が強く偏り (令和: 四分位 14/26/44、最大 193)、線形では大半が淡くなるため。
+  区切りは期間の長さで 3 種 (単年度 0/1/2/5/10/20、令和 0/1/10/25/50/100、全期間 0/1/50/100/200/400)。
+  同じ長さの期間どうしは同じ区切りで比べられる。色は do の SEQ ランプから 6 段。正確な件数 (関与・按分) と主な計画機関
+  上位 3 は `notes` に入れ、ツールチップと「表で見る」に出す。
+- 根室振興局管内の 6 村は照合対象外なので値を与えず「無データ」になる。地図としては do の既定どおり描く。
+- 集計は `build.py` が `docs/data/series/<key>.json` と `docs/data/summary.json` に書く。按分件数の道全体の合計は
+  「測量件数 − 市町村を特定できない件数」と一致することを確かめた (全期間 17,514 − 239 = 17,275.0)。
+- 読み込み時にコンソールへ `Cannot read properties of undefined (reading 'key')` が 1 件出るが、tabularmaps/do の
+  ダッシュボードでも同じく出る (Open MCT 4.3.1 側)。表示・操作への影響は見当たらない。
