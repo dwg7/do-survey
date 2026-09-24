@@ -52,3 +52,10 @@
   background: #ffffff; border: 2px solid #3987e5; cursor: pointer; }
 .ds-range input[type=range]:focus-visible::-webkit-slider-thumb { outline: 2px solid #eb6834; outline-offset: 1px; }
 .ds-range-ends { display: flex; justify-content: space-between; color: #898781; font-size: 10px; }
+
+/* ツールチップ: 計画機関を全部並べる (件数の多い順)。12 を超えたら 2 段組。 */
+.ds-host .tm-tip.ds-tip { max-width: min(560px, 90%); }
+.ds-tip-planners { list-style: none; margin: 2px 0 0; padding: 0; font-size: 11px; }
+.ds-tip-planners li { display: flex; justify-content: space-between; gap: 10px; break-inside: avoid; }
+.ds-tip-planners li span:last-child { font-variant-numeric: tabular-nums; opacity: .85; }
+.ds-tip-cols { columns: 2; column-gap: 16px; }

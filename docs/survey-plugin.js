@@ -83,8 +83,8 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
       values[m.code] = classOf(n, br);
       const pc = new Map();
       for (const [yi, pi, c] of matrix.plannerCounts[m.code] || []) if (yi >= i0 && yi <= i1) pc.set(pi, (pc.get(pi) || 0) + c);
-      const top = [...pc.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 3)
-        .map(([pi, c]) => [matrix.planners[pi], c]);
+      const top = [...pc.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0])
+        .map(([pi, c]) => [matrix.planners[pi], c]);   // 全部 (件数の多い順)
       notes[m.code] = `${n} 件` + (top.length ? ' · ' + top.map(([p, c]) => `${p} ${c}`).join('、') : '');
       tips[m.code] = { name: m.fullName, n, top };
     }
@@ -102,7 +102,7 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
   }
 
   const ABOUT = '件数は、測量が関わった市町村それぞれに 1 件と数えます (複数の市町村にまたがる測量は各市町村に 1 件)。' +
-    'セルに触れると件数と主な計画機関 (上位 3)、「表で見る」で一覧。東端の列の 6 村は北方領土の村で、照合の対象外 (無データ)。';
+    'セルに触れると件数と計画機関、「表で見る」で一覧。東端の列の 6 村は北方領土の村で、照合の対象外 (無データ)。';
 
   return function install(openmct) {
     openmct.types.addType('dosurvey.root', { name: '公共測量の概要', description: '北海道の公共測量の概要', creatable: false, cssClass: 'icon-dataset' });
@@ -173,9 +173,17 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
                 const tip = host.querySelector('.tm-tip');
                 const t = cell && series && series.tips[cell.getAttribute('data-code')];
                 if (!t || !tip || tip.hidden) return;
+                tip.classList.add('ds-tip');
                 tip.innerHTML = `<b>${t.name}</b><span class="tm-tip-val">件数 ${t.n} 件</span>` +
-                  (t.top.length ? `<span class="tm-tip-sub">計画機関</span>` +
-                    t.top.map(([p, c]) => `<span class="tm-tip-sub">${p} ${c} 件</span>`).join('') : '');
+                  (t.top.length ? `<span class="tm-tip-sub">計画機関 (${t.top.length})</span>` +
+                    `<ol class="ds-tip-planners${t.top.length > 12 ? ' ds-tip-cols' : ''}">` +
+                    t.top.map(([p, c]) => `<li><span>${p}</span><span>${c}</span></li>`).join('') + '</ol>' : '');
+                // 中身を差し替えて大きさが変わったので、描画コアと同じ規則で位置を取り直す
+                const r = tip.parentElement.getBoundingClientRect();
+                let x = ev.clientX - r.left + 12, y = ev.clientY - r.top + 12;
+                if (x + tip.offsetWidth > r.width) x = Math.max(0, ev.clientX - r.left - tip.offsetWidth - 12);
+                if (y + tip.offsetHeight > r.height) y = Math.max(0, ev.clientY - r.top - tip.offsetHeight - 12);
+                tip.style.left = x + 'px'; tip.style.top = y + 'px';
               });
               const note = document.createElement('div');
               note.className = 'tm-openmct-note';
