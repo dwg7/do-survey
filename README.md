@@ -6,7 +6,7 @@ GeoParquet にまとめる。これを元に、「測量地域 市区町村」�
 
 ## ダッシュボード
 
-公開版: https://dwg7.github.io/do-survey/ (GitHub Pages: main の /docs)
+公開版: https://dwg7.unopengis.org/do-survey/ (GitHub Pages: main の /docs)
 
 ```bash
 python3 -m http.server 8767 --directory docs   # http://localhost:8767/
