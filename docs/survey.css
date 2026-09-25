@@ -55,9 +55,11 @@
 
 /* ツールチップ: 計画機関を全部並べる (件数の多い順)。12 を超えたら 2 段組。 */
 /* Edge でも白すぎる面にならないよう、背景色と文字色をここで明示する。 */
-.ds-host .tm-tip { background-color: #52514e; color: #ffffff; }
+.ds-host .tm-tip { background-color: #3f3e3b; color: #ffffff; }
 .ds-host .tm-tip.ds-tip { max-width: min(560px, 90%); }
+.ds-host .tm-tip .tm-tip-val { color: #f7f6ef; }
+.ds-host .tm-tip .tm-tip-sub { color: #ece9db; opacity: 1; }
 .ds-tip-planners { list-style: none; margin: 2px 0 0; padding: 0; font-size: 11px; }
-.ds-tip-planners li { display: flex; justify-content: space-between; gap: 10px; break-inside: avoid; }
-.ds-tip-planners li span:last-child { font-variant-numeric: tabular-nums; opacity: .85; }
+.ds-tip-planners li { display: flex; justify-content: space-between; gap: 10px; break-inside: avoid; color: #f7f6ef; }
+.ds-tip-planners li span:last-child { color: #ece9db; font-variant-numeric: tabular-nums; opacity: 1; }
 .ds-tip-cols { columns: 2; column-gap: 16px; }

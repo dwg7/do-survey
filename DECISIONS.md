@@ -123,3 +123,9 @@ Windows Edge では、tabularmaps/do の既定ツールチップ背景が白く�
 do-survey 側で差し替えるツールチップは `docs/survey.css` で背景を灰色 (`#52514e`)・文字色を白に明示し、
 Edge でも読みやすくする。あわせて、描画コアが SVG に入れる `<title>北海道 tabular map</title>` はブラウザ既定の
 ツールチップとして市町村名に重なるため、`docs/survey-plugin.js` が地図生成直後に取り除き、SVG には `aria-label` を付け直す。
+
+## D14 (2026-09-25) Edge の計画機関テキストはさらに明るくし、背景はもう少し暗くする
+
+hfu が Windows Edge の hover ペーンで「計画機関」まわりの文字がまだ背景色に埋まると指摘した。
+`docs/survey.css` で do-survey 側の差し替えツールチップの背景を `#3f3e3b` に少し暗くし、`計画機関` の見出し・件数・
+一覧の文字色を個別に明るく固定する。描画コア (`docs/vendor/do/`) は複製物なので変更しない。
