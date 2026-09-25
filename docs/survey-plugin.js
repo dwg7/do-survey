@@ -164,6 +164,12 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
                 layout: base.layout, municipalities: base.municipalities, wards: base.wards,
                 mode: 'region', title: domainObject.name, includeNorthernTerritoriesVillages: true
               });
+              const svg = host.querySelector('.tm-svg');
+              if (svg) {
+                svg.setAttribute('aria-label', domainObject.name + ' の表形式地図');
+                const title = svg.querySelector('title');
+                if (title) title.remove();
+              }
               let series = null;
               const repaint = () => { if (!disposed) { series = buildSeries(base, y0, y1); map.setSeries(series); } };
               repaint();
