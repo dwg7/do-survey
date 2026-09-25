@@ -55,6 +55,11 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
     }
     return labels;
   }
+  // 計画機関名などは登録者が自由に書く欄なので、HTML に入れる前に必ずエスケープする
+  // (notes は描画コアが innerHTML で表とツールチップに入れる)。
+  function esc(v) {
+    return String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
   function rangeName(y0, y1) { return y0 === y1 ? `${y0} 年度` : `${y0}〜${y1} 年度`; }
 
   const cache = new Map();
@@ -85,7 +90,7 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
       for (const [yi, pi, c] of matrix.plannerCounts[m.code] || []) if (yi >= i0 && yi <= i1) pc.set(pi, (pc.get(pi) || 0) + c);
       const top = [...pc.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0])
         .map(([pi, c]) => [matrix.planners[pi], c]);   // 全部 (件数の多い順)
-      notes[m.code] = `${n} 件` + (top.length ? ' · ' + top.map(([p, c]) => `${p} ${c}`).join('、') : '');
+      notes[m.code] = `${n} 件` + (top.length ? ' · ' + top.map(([p, c]) => `${esc(p)} ${c}`).join('、') : '');
       tips[m.code] = { name: m.fullName, n, top };
     }
     const surveys = summary.years.filter((y) => y.year >= y0 && y.year <= y1).reduce((a, y) => a + y.surveys, 0);
@@ -128,19 +133,39 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
       }
     });
 
+    // D10 の版 (関与件数 / 按分件数 × 令和・全期間・各年度) のキーを、今の項目に読み替える (D15)。
+    // 共有された URL や Open MCT の「最近見たもの」に残った古いキーでも開けるようにするため。
+    function legacy(key) {
+      if (key === 'folder:involved' || key === 'folder:apportioned') return { to: 'folder:years' };
+      const m = /^map:(?:involved|apportioned):(reiwa|all|\d{4})$/.exec(key);
+      if (!m) return null;
+      if (m[1] === 'all') return { to: 'map:range' };
+      if (m[1] === 'reiwa') return { to: 'map:range', name: '期間を選んで見る (2019 年度〜)', dosurvey: { range: true, from: 2019 } };
+      return { to: `map:year:${m[1]}` };
+    }
+    function resolve(key) {
+      const o = objects.get(key);
+      if (o) return { obj: o, key };
+      const l = legacy(key);
+      const target = l && objects.get(l.to);
+      if (!target) return null;
+      const alias = Object.assign({}, target, { identifier: id(key) }, l.name ? { name: l.name } : {}, l.dosurvey ? { dosurvey: l.dosurvey } : {});
+      return { obj: alias, key: l.to };
+    }
+
     openmct.objects.addRoot(id('root'));
     openmct.objects.addProvider(NS, {
       get(identifier) {
         return ready.then(() => {
-          const o = objects.get(identifier.key);
-          if (!o) throw new Error('Unknown object ' + identifier.key);
-          return o;
+          const r = resolve(identifier.key);
+          if (!r) throw new Error('Unknown object ' + identifier.key);
+          return r.obj;
         });
       }
     });
     openmct.composition.addProvider({
       appliesTo: (o) => o.identifier.namespace === NS && (o.type === 'folder' || o.type === 'dosurvey.root'),
-      load: (o) => ready.then(() => compositions.get(o.identifier.key) || [])
+      load: (o) => ready.then(() => { const r = resolve(o.identifier.key); return (r && compositions.get(r.key)) || []; })
     });
 
     // リーフ: tabular map
@@ -158,12 +183,17 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
               if (disposed) return;
               const years = base.matrix.years;
               const opt = domainObject.dosurvey;
-              let y0 = opt.range ? years[0] : opt.year, y1 = opt.range ? years[years.length - 1] : opt.year;
-              if (opt.range) host.appendChild(rangeControl(years, (a, b) => { y0 = a; y1 = b; repaint(); }));
+              let y0 = opt.range ? Math.max(years[0], opt.from || years[0]) : opt.year;
+              let y1 = opt.range ? years[years.length - 1] : opt.year;
+              if (opt.range) host.appendChild(rangeControl(years, y0, (a, b) => { y0 = a; y1 = b; repaint(); }));
               map = window.TabularMap.create(host, {
                 layout: base.layout, municipalities: base.municipalities, wards: base.wards,
                 mode: 'region', title: domainObject.name, includeNorthernTerritoriesVillages: true
               });
+              // 件数は札幌市全体でしか持たない (2001 年度以降の記載は「札幌市」、それ以前の区名も札幌市に読み替える。D6) ので、
+              // 10 区に展開すると全区が無データになる。展開のボタンは出さない (D15)。
+              const wardsBtn = [...host.querySelectorAll('.tm-btn')].find((b) => b.textContent.includes('10区'));
+              if (wardsBtn) wardsBtn.style.display = 'none';
               const svg = host.querySelector('.tm-svg');
               if (svg) {
                 svg.setAttribute('aria-label', domainObject.name + ' の表形式地図');
@@ -180,10 +210,10 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
                 const t = cell && series && series.tips[cell.getAttribute('data-code')];
                 if (!t || !tip || tip.hidden) return;
                 tip.classList.add('ds-tip');
-                tip.innerHTML = `<b>${t.name}</b><span class="tm-tip-val">件数 ${t.n} 件</span>` +
+                tip.innerHTML = `<b>${esc(t.name)}</b><span class="tm-tip-val">件数 ${t.n} 件</span>` +
                   (t.top.length ? `<span class="tm-tip-sub">計画機関 (${t.top.length})</span>` +
                     `<ol class="ds-tip-planners${t.top.length > 12 ? ' ds-tip-cols' : ''}">` +
-                    t.top.map(([p, c]) => `<li><span>${p}</span><span>${c}</span></li>`).join('') + '</ol>' : '');
+                    t.top.map(([p, c]) => `<li><span>${esc(p)}</span><span>${c}</span></li>`).join('') + '</ol>' : '');
                 // 中身を差し替えて大きさが変わったので、描画コアと同じ規則で位置を取り直す
                 const r = tip.parentElement.getBoundingClientRect();
                 let x = ev.clientX - r.left + 12, y = ev.clientY - r.top + 12;
@@ -227,14 +257,14 @@ window.DoSurveyPlugin = function DoSurveyPlugin(options) {
   };
 
   // 年度範囲のスライダー (2 つのつまみ)。
-  function rangeControl(years, onChange) {
+  function rangeControl(years, start, onChange) {
     const lo = years[0], hi = years[years.length - 1];
     const wrap = document.createElement('div');
     wrap.className = 'ds-range';
     wrap.innerHTML = `<div class="ds-range-label"><span class="ds-range-v"></span>
         <button type="button" class="ds-range-all">全期間に戻す</button></div>
       <div class="ds-range-track"><div class="ds-range-fill"></div>
-        <input type="range" class="ds-range-a" min="${lo}" max="${hi}" step="1" value="${lo}" aria-label="開始年度">
+        <input type="range" class="ds-range-a" min="${lo}" max="${hi}" step="1" value="${start}" aria-label="開始年度">
         <input type="range" class="ds-range-b" min="${lo}" max="${hi}" step="1" value="${hi}" aria-label="終了年度"></div>
       <div class="ds-range-ends"><span>${lo}</span><span>${hi}</span></div>`;
     const a = wrap.querySelector('.ds-range-a'), b = wrap.querySelector('.ds-range-b');
