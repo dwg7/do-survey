@@ -18,33 +18,9 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 
 ## 北海道測量概況 (分析)
 
-公共測量を観測窓に「北海道で何が行われているか」を読む試み。
-[令和7年度 北海道測量概況 (改訂版) 素案](reports/r07/draft.md) と [根拠表](reports/r07/tables.md)。
-長期の変化が取れるかの見積もりは [reports/longterm/estimate.md](reports/longterm/estimate.md)、
-平成22・27年度、令和2・7年度の飛び石の比較は [reports/stepping/summary.md](reports/stepping/summary.md)、
-事業費 (北海道開発局関係予算) との突き合わせは [reports/budget/summary.md](reports/budget/summary.md)、
-単年度の概況の自然文と情報量の評価は [reports/annual/summary.md](reports/annual/summary.md)、
-北海道の「地勢」を他の地方と比べたものは [reports/national/summary.md](reports/national/summary.md)、
-測量期間 (工期) の分析は [reports/term/summary.md](reports/term/summary.md)、
-受付の季節の形の分解 (差の差) は [reports/season/summary.md](reports/season/summary.md)。
-
-```bash
-python3 scripts/classify.py     # 発注主体・分野・ねらい (行政目的 6 分類)・段階に分類 → analysis/classified.csv
-python3 scripts/r07_tables.py   # 根拠表 reports/r07/tables.md
-python3 scripts/longterm_tables.py   # 長期の飛び石 reports/longterm/tables.md
-python3 scripts/year_tables.py 2010 reports/h22/tables.md   # 任意の年度の根拠表 (r07_tables.py は 2025 の版)
-python3 scripts/stepping_compare.py  # 飛び石の比較 reports/stepping/compare.md
-python3 scripts/fetch_budget.py      # 開発局の当初予算 → data/external/hkd-budget-initial.csv (PDF は data/raw/budget/)
-python3 scripts/budget_compare.py    # 件数と事業費 reports/budget/compare.md
-python3 scripts/annual_overview.py   # 単年度の概況 reports/annual/overviews.md と情報量 reports/annual/skill.md
-for s in B C D E F G H I J K; do python3 scripts/fetch.py --section $s --years 2023 2024 2025; done   # 他の地方
-python3 scripts/national_compare.py  # 地方の比較 reports/national/compare.md
-python3 scripts/term_analysis.py     # 工期の分析 reports/term/tables.md
-for s in B C D E F G H I J; do python3 scripts/fetch.py --section $s --years 2009 2014 2019; done
-python3 scripts/season_did.py        # 季節の形の分解 reports/season/compare.md
-```
-
-分類の規則は `analysis/planner-rules.csv`・`analysis/aim-rules.csv`・`analysis/stage-rules.csv` (DECISIONS.md D16)。
+公共測量を観測窓に「北海道で何が行われているか」を読む試み。レポートの一覧・推奨の読む順・後で修正した主張・
+再現の手順は **[reports/README.md](reports/README.md)** にまとめてある。最初の一本は
+[令和7年度 北海道測量概況 (改訂版) 素案](reports/r07/draft.md)。
 
 ## データ
 
