@@ -23,7 +23,8 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 長期の変化が取れるかの見積もりは [reports/longterm/estimate.md](reports/longterm/estimate.md)、
 平成22・27年度、令和2・7年度の飛び石の比較は [reports/stepping/summary.md](reports/stepping/summary.md)、
 事業費 (北海道開発局関係予算) との突き合わせは [reports/budget/summary.md](reports/budget/summary.md)、
-単年度の概況の自然文と情報量の評価は [reports/annual/summary.md](reports/annual/summary.md)。
+単年度の概況の自然文と情報量の評価は [reports/annual/summary.md](reports/annual/summary.md)、
+北海道の「地勢」を他の地方と比べたものは [reports/national/summary.md](reports/national/summary.md)。
 
 ```bash
 python3 scripts/classify.py     # 発注主体・分野・ねらい (行政目的 6 分類)・段階に分類 → analysis/classified.csv
@@ -34,6 +35,8 @@ python3 scripts/stepping_compare.py  # 飛び石の比較 reports/stepping/compa
 python3 scripts/fetch_budget.py      # 開発局の当初予算 → data/external/hkd-budget-initial.csv (PDF は data/raw/budget/)
 python3 scripts/budget_compare.py    # 件数と事業費 reports/budget/compare.md
 python3 scripts/annual_overview.py   # 単年度の概況 reports/annual/overviews.md と情報量 reports/annual/skill.md
+for s in B C D E F G H I J K; do python3 scripts/fetch.py --section $s --years 2023 2024 2025; done   # 他の地方
+python3 scripts/national_compare.py  # 地方の比較 reports/national/compare.md
 ```
 
 分類の規則は `analysis/planner-rules.csv`・`analysis/aim-rules.csv`・`analysis/stage-rules.csv` (DECISIONS.md D16)。
