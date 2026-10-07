@@ -21,8 +21,8 @@
 
 ## コミットするもの
 
-- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、`analysis/*-rules.csv`、`reports/`、ドキュメント。
-- しない: `data/raw/` (27MB、`fetch.py` で再現できる)、`analysis/classified.csv` (`classify.py` の派生物)。
+- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、`analysis/*-rules.csv`、`data/external/` (外部資料から抜き出した表、出典 URL 付き)、`reports/`、ドキュメント。
+- しない: `data/raw/` (27MB、`fetch.py` で再現できる。予算の PDF `data/raw/budget/` も)、`analysis/classified.csv` (`classify.py` の派生物)。
 
 ## 市町村の照合
 
@@ -60,6 +60,7 @@
 - 素案 `reports/r07/draft.md` の数字は必ず `reports/r07/tables.md` (`scripts/r07_tables.py` の生成物) か、そこから再計算できる値にする。
 - 根拠表の中身は `scripts/year_tables.py` (受付年度を引数に取る)。変えたら `r07_tables.py` の出力が変わらないかを確かめ、変わるなら素案の数字も同じコミットで直す。
 - 長期の比較は平成21年度以降を土台にする (D17)。平成22年度は業務名がなく、事業の種類と段階は比べない。
+- 件数は「測量の需要」であって事業の規模ではない。件数の増減を事業の増減として読むのは、100 億円あたりの件数 (密度) が安定している区間・分野だけ (D19)。
 - 件数は規模ではない、受付は契約時点、令和7年 4〜8 月は業務名の欠落がある、実施地域図の面積は作業範囲の外形、を前提として書く。
 
 ## 出典表記
