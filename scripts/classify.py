@@ -3,7 +3,7 @@
 
 入力: data/surveys.parquet (duckdb CLI で必要な列だけ書き出して読む)
 規則: analysis/planner-rules.csv (発注主体)、analysis/aim-rules.csv (分野・ねらい)、analysis/stage-rules.csv (段階)
-出力: analysis/classified.csv (受付年度 2019〜 の 1 件 = 1 行。どの規則で決まったかを残す)
+出力: analysis/classified.csv (全年度の 1 件 = 1 行。どの規則で決まったかを残す)
 
 ねらいの規則は「計画機関 → 業務名 (目的) → 担当部署」の順に当て、最初に当たったものを採る。
 section_pattern がある規則は、担当部署 (と計画機関名) もその正規表現に当たる時だけ有効。
@@ -18,7 +18,7 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 A = ROOT / 'analysis'
-FIRST_YEAR = 2019
+FIRST_YEAR = 1983   # 全年度。令和7年度の根拠表 (r07_tables.py) は 2019〜2025 だけを読む
 MUNIS = ROOT / 'docs/vendor/do/data/municipalities.json'
 # 北海道の外にある実施地域図 (DECISIONS.md D5) は面積・重心に使わない
 HOKKAIDO_BBOX = (139.3, 41.3, 146.0, 45.6)

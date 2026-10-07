@@ -20,10 +20,12 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 
 公共測量を観測窓に「北海道で何が行われているか」を読む試み。
 [令和7年度 北海道測量概況 (改訂版) 素案](reports/r07/draft.md) と [根拠表](reports/r07/tables.md)。
+長期の変化が取れるかの見積もりは [reports/longterm/estimate.md](reports/longterm/estimate.md)。
 
 ```bash
 python3 scripts/classify.py     # 発注主体・分野・ねらい (行政目的 6 分類)・段階に分類 → analysis/classified.csv
 python3 scripts/r07_tables.py   # 根拠表 reports/r07/tables.md
+python3 scripts/longterm_tables.py   # 長期の飛び石 reports/longterm/tables.md
 ```
 
 分類の規則は `analysis/planner-rules.csv`・`analysis/aim-rules.csv`・`analysis/stage-rules.csv` (DECISIONS.md D16)。
