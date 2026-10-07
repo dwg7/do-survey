@@ -21,8 +21,8 @@
 
 ## コミットするもの
 
-- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、ドキュメント。
-- しない: `data/raw/` (27MB、`fetch.py` で再現できる)。
+- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、`analysis/*-rules.csv`、`reports/`、ドキュメント。
+- しない: `data/raw/` (27MB、`fetch.py` で再現できる)、`analysis/classified.csv` (`classify.py` の派生物)。
 
 ## 市町村の照合
 
@@ -50,6 +50,15 @@
   奥のリーフは URL `#/browse/dosurvey:root/dosurvey:map:range` や
   `#/browse/dosurvey:root/dosurvey:folder:years/dosurvey:map:year:<年度>` で開く。
 - 画面に出典 (国土地理院) と、dwg7 が加工したことを必ず出す (概要ビューと各地図の注記)。
+
+## 分析 (北海道測量概況)
+
+- `scripts/classify.py` が `analysis/*-rules.csv` を上から順に当てて分類する。ねらいは「計画機関 → 業務名 → 担当部署
+  (と計画機関名)」の順で最初に当たった規則。`section_pattern` のある規則は担当部署も当たる時だけ有効。結果の
+  `analysis/classified.csv` は派生物でコミットしない。
+- 規則を変えたら、決まらない案件 (`*-none`) が 0 であることと、無作為抽出での読み合わせをやり直し、DECISIONS に書く。
+- 素案 `reports/r07/draft.md` の数字は必ず `reports/r07/tables.md` (`scripts/r07_tables.py` の生成物) か、そこから再計算できる値にする。
+- 件数は規模ではない、受付は契約時点、令和7年 4〜8 月は業務名の欠落がある、実施地域図の面積は作業範囲の外形、を前提として書く。
 
 ## 出典表記
 

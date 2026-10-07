@@ -16,6 +16,18 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 「年度別」から年度を選ぶと、市町村ごとの件数で [tabularmaps/do](https://github.com/tabularmaps/do) の 16×16 表形式地図が
 塗られる (6 段の順序尺度。セルに触れると件数と主な計画機関)。ルートを選ぶと年度ごとの件数の概要。
 
+## 北海道測量概況 (分析)
+
+公共測量を観測窓に「北海道で何が行われているか」を読む試み。
+[令和7年度 北海道測量概況 (改訂版) 素案](reports/r07/draft.md) と [根拠表](reports/r07/tables.md)。
+
+```bash
+python3 scripts/classify.py     # 発注主体・分野・ねらい (行政目的 6 分類)・段階に分類 → analysis/classified.csv
+python3 scripts/r07_tables.py   # 根拠表 reports/r07/tables.md
+```
+
+分類の規則は `analysis/planner-rules.csv`・`analysis/aim-rules.csv`・`analysis/stage-rules.csv` (DECISIONS.md D16)。
+
 ## データ
 
 | ファイル | 内容 |
