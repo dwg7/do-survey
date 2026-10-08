@@ -33,6 +33,7 @@
 | 8 | [測量期間 (工期) の分析](term/summary.md) | 航空撮影は季節に従うか。工期はどう決まるか | 航空写真は春・レーザは晩秋に窓を開け、工期は 30〜45 日長い。工期は歩掛ではなく暦 (契約時期と旬の締め切り) で決まる | [tables](term/tables.md) | D22 |
 | 9 | [原因の分からない「予想外」4 件の掘り下げ](anomaly/summary.md) | annual で原因を「不明」に残した 4 件は何か | H23 空知は主に物差しと分母 (件数は平常)。H26 上川は国営 2 地区と道営の重なり、H28 釧路は道の事業の終わりの重なりで端境期の始まり。R4 上川は道の発注の谷の底で、契約は平常 (10 で届出の変化と判明) | [tables](anomaly/tables.md) | D24 |
 | 10 | [道の発注: 届出と委託契約の突き合わせ](contracts/summary.md) | 道の届出の増減は事業の増減か、届出の仕方の変化か | 令和6年度の倍増も令和4年度の上川の減少も、委託契約は動かず届出の比率が動いた (レンズ)。道の届出は道の予算の転換 (令和元〜2年度の増額) も写さない | [compare](contracts/compare.md) | D25 |
+| 11 | [開発局の補正予算・ゼロ国債と届出](supplementary/summary.md) | 補正予算は件数に写るか。ゼロ国債は冬の受付を作るか | 開発局の件数の増減は「当初 + 前年度の補正」と最もよく合う (相関 +0.70)。ゼロ国債は 1〜3 月の受付を作っていない | [compare](supplementary/compare.md) | D26 |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -52,6 +53,7 @@
 | annual: 平成23年度は「空知の割合がかなり高い」(原因不明) | 件数は平常。前 5 年度の平年に届出の狭い平成20年度以前と平成22年度の谷が入り、開発局の谷で分母が縮んだ。平成21〜25年度の概況の「平年」は平成20年度以前を含む点に注意 | anomaly (D24) |
 | anomaly: 令和4年度の上川の減少は原因未確定 (道の予算か届出か) | 道の委託契約は平常で、届出の比率が下がった (レンズ寄り) | contracts (D25)、anomaly §4 追記 |
 | r07・budget: 令和6年度の倍増は届出の増加と「みられる」(推定) | 道の委託契約が増えていないことで裏付け (推定から確認へ) | contracts (D25) |
+| budget: 件数は予算の転換点は写すが「年ごとの増減は合わない」 | 前年度の補正予算を足すと増減の相関は +0.31 → +0.70。合わなかった一部は補正を入れていなかったため | supplementary (D26) |
 
 ## レビューで見てほしい点
 
@@ -66,7 +68,7 @@
 - 密度 (100 億円あたりの件数) で補正した分野の推移
 - 出来事の年表 (原因の分からない予想外 4 件は [anomaly](anomaly/summary.md) で掘り下げ済み。令和4年度の上川は未確定)
 - 地域 (振興局) の推移と、測量のない市町村の変化
-- 補正予算の取得 (道の当初予算の推移と委託契約は 10 で取得済み)
+- 分野別の補正予算と分野別の届出 (補正の総額は 11、道の当初予算の推移と委託契約は 10 で取得済み)
 
 ## 再現
 
@@ -87,4 +89,6 @@ python3 scripts/term_analysis.py     # 8 reports/term/tables.md
 python3 scripts/anomaly_drill.py     # 9 reports/anomaly/tables.md
 python3 scripts/fetch_pref_contracts.py   # 道の委託・工事の契約 → data/external/hokkaido-pref-contracts-h1.csv (PDF は data/raw/budget/pref/)
 python3 scripts/pref_contracts_compare.py # 10 reports/contracts/compare.md
+python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国債 → data/external/hkd-budget-supplementary.csv (PDF は data/raw/budget/hosei/)
+python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
 ```
