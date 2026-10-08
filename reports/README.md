@@ -34,6 +34,7 @@
 | 9 | [原因の分からない「予想外」4 件の掘り下げ](anomaly/summary.md) | annual で原因を「不明」に残した 4 件は何か | H23 空知は主に物差しと分母 (件数は平常)。H26 上川は国営 2 地区と道営の重なり、H28 釧路は道の事業の終わりの重なりで端境期の始まり。R4 上川は道の発注の谷の底で、契約は平常 (10 で届出の変化と判明) | [tables](anomaly/tables.md) | D24 |
 | 10 | [道の発注: 届出と委託契約の突き合わせ](contracts/summary.md) | 道の届出の増減は事業の増減か、届出の仕方の変化か | 令和6年度の倍増も令和4年度の上川の減少も、委託契約は動かず届出の比率が動いた (レンズ)。道の届出は道の予算の転換 (令和元〜2年度の増額) も写さない | [compare](contracts/compare.md) | D25 |
 | 11 | [開発局の補正予算・ゼロ国債と届出](supplementary/summary.md) | 補正予算は件数に写るか。ゼロ国債は冬の受付を作るか | 開発局の件数の増減は「当初 + 前年度の補正」と最もよく合う (相関 +0.70)。ゼロ国債は 1〜3 月の受付を作っていない | [compare](supplementary/compare.md) | D26 |
+| 12 | [地域 (振興局) の推移と、測量のない市町村](region/summary.md) | 振興局の割合はどう動いたか。測量のない市町村はどこか | 伸び続けているのは十勝だけ (道の発注)。空知・上川は令和5年度まで下がり、令和6年度の届出の段差で戻った。開発局の発注は東へ。毎年 6〜28 市町村に測量がなく、旧産炭地と島の町が続けて空白になる | [tables](region/tables.md) | D27 |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -54,6 +55,7 @@
 | anomaly: 令和4年度の上川の減少は原因未確定 (道の予算か届出か) | 道の委託契約は平常で、届出の比率が下がった (レンズ寄り) | contracts (D25)、anomaly §4 追記 |
 | r07・budget: 令和6年度の倍増は届出の増加と「みられる」(推定) | 道の委託契約が増えていないことで裏付け (推定から確認へ) | contracts (D25) |
 | budget: 件数は予算の転換点は写すが「年ごとの増減は合わない」 | 前年度の補正予算を足すと増減の相関は +0.31 → +0.70。合わなかった一部は補正を入れていなかったため | supplementary (D26) |
+| 飛び石: 「地域の重心は十勝・空知へ」 | 伸び続けているのは十勝だけ。空知の上昇は谷の年 (平成22年度) と令和6年度以降の届出の段差に挟まれた比較による | stepping §4 (D27) |
 
 ## レビューで見てほしい点
 
@@ -67,7 +69,7 @@
 
 - 密度 (100 億円あたりの件数) で補正した分野の推移
 - 出来事の年表 (原因の分からない予想外 4 件は [anomaly](anomaly/summary.md) で掘り下げ済み。令和4年度の上川は未確定)
-- 地域 (振興局) の推移と、測量のない市町村の変化
+- 人口・面積あたりの件数 (測量のない市町村が「小さいから」か「事業がないから」か)。地域の推移と測量のない市町村は 12 で済み
 - 分野別の補正予算と分野別の届出 (補正の総額は 11、道の当初予算の推移と委託契約は 10 で取得済み)
 
 ## 再現
@@ -91,4 +93,5 @@ python3 scripts/fetch_pref_contracts.py   # 道の委託・工事の契約 → d
 python3 scripts/pref_contracts_compare.py # 10 reports/contracts/compare.md
 python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国債 → data/external/hkd-budget-supplementary.csv (PDF は data/raw/budget/hosei/)
 python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
+python3 scripts/region_trends.py          # 12 reports/region/tables.md
 ```
