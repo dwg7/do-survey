@@ -30,6 +30,7 @@
 | 6 | [北海道の「地勢」は北海道に固有か](national/summary.md) | 毎年同じ特徴は北海道に固有か | 7 月の山・冬の空白は北海道に固有。農業が最大は農村型の地方に共通。市町村・民間の発注と固定資産の航空写真は 10 地方で最少 | [compare](national/compare.md) | D21 |
 | 7 | [受付の季節の形の分解](season/summary.md) | 夏の集中の強まりは全国一律か | 元からの地勢に、全国共通の前倒し (約半分) と北海道に固有の上乗せ (夏の山の鋭化、開発局の早期発注) が重なった | [compare](season/compare.md) | D23 |
 | 8 | [測量期間 (工期) の分析](term/summary.md) | 航空撮影は季節に従うか。工期はどう決まるか | 航空写真は春・レーザは晩秋に窓を開け、工期は 30〜45 日長い。工期は歩掛ではなく暦 (契約時期と旬の締め切り) で決まる | [tables](term/tables.md) | D22 |
+| 9 | [原因の分からない「予想外」4 件の掘り下げ](anomaly/summary.md) | annual で原因を「不明」に残した 4 件は何か | H23 空知は主に物差しと分母 (件数は平常)。H26 上川は国営 2 地区と道営の重なり、H28 釧路は道の事業の終わりの重なりで端境期の始まり。R4 上川は道の発注の谷の底で、原因は未確定 | [tables](anomaly/tables.md) | D24 |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -46,6 +47,7 @@
 | r07 の公共事業執行 131 件・防災減災 131 件 | 分類規則の追加 (地すべり) で 128 件・134 件 | r07 §4 (D17) |
 | 飛び石: 「歌志内市は令和元〜7年度も 0 件」 | 令和元・4・5年度に計 6 件ある | stepping §5 (D18) |
 | 地方の比較: 「分野: 行政情報」は北海道の特徴 (z = +7.5) | 分類規則のずれ。他の地方の航空写真は定型語「固定資産」で別の分野に入る | national (D21) |
+| annual: 平成23年度は「空知の割合がかなり高い」(原因不明) | 件数は平常。前 5 年度の平年に届出の狭い平成20年度以前と平成22年度の谷が入り、開発局の谷で分母が縮んだ。平成21〜25年度の概況の「平年」は平成20年度以前を含む点に注意 | anomaly (D24) |
 
 ## レビューで見てほしい点
 
@@ -58,7 +60,7 @@
 ## まだやっていないこと (時系列の筋の残り)
 
 - 密度 (100 億円あたりの件数) で補正した分野の推移
-- 出来事の年表と、原因の分からない予想外 4 件 (平成23年度の空知、平成26年度の上川、平成28年度の釧路の減少、令和4年度の上川の減少)
+- 出来事の年表 (原因の分からない予想外 4 件は [anomaly](anomaly/summary.md) で掘り下げ済み。令和4年度の上川は未確定)
 - 地域 (振興局) の推移と、測量のない市町村の変化
 - 補正予算と道の予算の取得
 
@@ -78,4 +80,5 @@ python3 scripts/national_compare.py  # 6 reports/national/compare.md
 for s in B C D E F G H I J; do python3 scripts/fetch.py --section $s --years 2009 2014 2019; done
 python3 scripts/season_did.py        # 7 reports/season/compare.md
 python3 scripts/term_analysis.py     # 8 reports/term/tables.md
+python3 scripts/anomaly_drill.py     # 9 reports/anomaly/tables.md
 ```
