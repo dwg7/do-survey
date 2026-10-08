@@ -4,7 +4,7 @@
 レポート群。2026-10-07〜08 に作成。すべて素案で、レビューを前提とする。
 
 - 数字は各レポートの根拠表 (スクリプトの生成物) から引いている。判断の経緯は [../DECISIONS.md](../DECISIONS.md) の D 番号を参照。
-- 出典: 国土地理院ウェブサイト「公共測量実施情報」(https://psgsv4.gsi.go.jp/giaSearch/) と北海道開発局「予算概要」を dwg7 が編集・加工して作成。
+- 出典: 国土地理院ウェブサイト「公共測量実施情報」(https://psgsv4.gsi.go.jp/giaSearch/)、北海道開発局「予算概要」、北海道「予算の概要」と北海道入札監視委員会の資料を dwg7 が編集・加工して作成。
 
 ## まず押さえる「レンズの癖」
 
@@ -12,7 +12,8 @@
 
 1. **件数は事業の規模ではない。** 測量の需要 (土地に手を入れる回数) を表す。金額では道路が最大でも、件数では農業が最大 ([budget](budget/summary.md))。
 2. **届出の範囲が広がり続けている。** 平成20年代初めまでは登録する機関そのものが増え ([longterm](longterm/estimate.md))、その後も 100 億円あたりの
-   件数 (密度) が上がり続けた。令和6年度の道営農業の倍増は、会計検査院の指摘を受けた届出の増加とみられる ([r07](r07/draft.md) §5、[budget](budget/summary.md))。
+   件数 (密度) が上がり続けた。令和6年度の道営農業の倍増は、会計検査院の指摘を受けた届出の増加で、道の委託契約は増えていない ([r07](r07/draft.md) §5、[budget](budget/summary.md)、[contracts](contracts/summary.md))。
+   **道の届出は事業の量より届出の運用に左右される** (契約に対する比率が年で揺れる、[contracts](contracts/summary.md))。
 3. **記録の形が年代で変わる。** 業務名 (自由記述) は平成24年度ごろから、担当部署と実施地域図は平成21年度ごろから。令和7年 4〜8 月は業務名が欠ける。
    計画機関名は現在の組織名に置き換えて記録されている。
 4. **受付は契約の時点、工期は契約の窓。** 作業の時期や作業時間ではない ([term](term/summary.md))。
@@ -30,7 +31,8 @@
 | 6 | [北海道の「地勢」は北海道に固有か](national/summary.md) | 毎年同じ特徴は北海道に固有か | 7 月の山・冬の空白は北海道に固有。農業が最大は農村型の地方に共通。市町村・民間の発注と固定資産の航空写真は 10 地方で最少 | [compare](national/compare.md) | D21 |
 | 7 | [受付の季節の形の分解](season/summary.md) | 夏の集中の強まりは全国一律か | 元からの地勢に、全国共通の前倒し (約半分) と北海道に固有の上乗せ (夏の山の鋭化、開発局の早期発注) が重なった | [compare](season/compare.md) | D23 |
 | 8 | [測量期間 (工期) の分析](term/summary.md) | 航空撮影は季節に従うか。工期はどう決まるか | 航空写真は春・レーザは晩秋に窓を開け、工期は 30〜45 日長い。工期は歩掛ではなく暦 (契約時期と旬の締め切り) で決まる | [tables](term/tables.md) | D22 |
-| 9 | [原因の分からない「予想外」4 件の掘り下げ](anomaly/summary.md) | annual で原因を「不明」に残した 4 件は何か | H23 空知は主に物差しと分母 (件数は平常)。H26 上川は国営 2 地区と道営の重なり、H28 釧路は道の事業の終わりの重なりで端境期の始まり。R4 上川は道の発注の谷の底で、原因は未確定 | [tables](anomaly/tables.md) | D24 |
+| 9 | [原因の分からない「予想外」4 件の掘り下げ](anomaly/summary.md) | annual で原因を「不明」に残した 4 件は何か | H23 空知は主に物差しと分母 (件数は平常)。H26 上川は国営 2 地区と道営の重なり、H28 釧路は道の事業の終わりの重なりで端境期の始まり。R4 上川は道の発注の谷の底で、契約は平常 (10 で届出の変化と判明) | [tables](anomaly/tables.md) | D24 |
+| 10 | [道の発注: 届出と委託契約の突き合わせ](contracts/summary.md) | 道の届出の増減は事業の増減か、届出の仕方の変化か | 令和6年度の倍増も令和4年度の上川の減少も、委託契約は動かず届出の比率が動いた (レンズ)。道の届出は道の予算の転換 (令和元〜2年度の増額) も写さない | [compare](contracts/compare.md) | D25 |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -48,6 +50,8 @@
 | 飛び石: 「歌志内市は令和元〜7年度も 0 件」 | 令和元・4・5年度に計 6 件ある | stepping §5 (D18) |
 | 地方の比較: 「分野: 行政情報」は北海道の特徴 (z = +7.5) | 分類規則のずれ。他の地方の航空写真は定型語「固定資産」で別の分野に入る | national (D21) |
 | annual: 平成23年度は「空知の割合がかなり高い」(原因不明) | 件数は平常。前 5 年度の平年に届出の狭い平成20年度以前と平成22年度の谷が入り、開発局の谷で分母が縮んだ。平成21〜25年度の概況の「平年」は平成20年度以前を含む点に注意 | anomaly (D24) |
+| anomaly: 令和4年度の上川の減少は原因未確定 (道の予算か届出か) | 道の委託契約は平常で、届出の比率が下がった (レンズ寄り) | contracts (D25)、anomaly §4 追記 |
+| r07・budget: 令和6年度の倍増は届出の増加と「みられる」(推定) | 道の委託契約が増えていないことで裏付け (推定から確認へ) | contracts (D25) |
 
 ## レビューで見てほしい点
 
@@ -62,7 +66,7 @@
 - 密度 (100 億円あたりの件数) で補正した分野の推移
 - 出来事の年表 (原因の分からない予想外 4 件は [anomaly](anomaly/summary.md) で掘り下げ済み。令和4年度の上川は未確定)
 - 地域 (振興局) の推移と、測量のない市町村の変化
-- 補正予算と道の予算の取得
+- 補正予算の取得 (道の当初予算の推移と委託契約は 10 で取得済み)
 
 ## 再現
 
@@ -81,4 +85,6 @@ for s in B C D E F G H I J; do python3 scripts/fetch.py --section $s --years 200
 python3 scripts/season_did.py        # 7 reports/season/compare.md
 python3 scripts/term_analysis.py     # 8 reports/term/tables.md
 python3 scripts/anomaly_drill.py     # 9 reports/anomaly/tables.md
+python3 scripts/fetch_pref_contracts.py   # 道の委託・工事の契約 → data/external/hokkaido-pref-contracts-h1.csv (PDF は data/raw/budget/pref/)
+python3 scripts/pref_contracts_compare.py # 10 reports/contracts/compare.md
 ```
