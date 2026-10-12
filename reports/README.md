@@ -17,7 +17,7 @@
 3. **記録の形が年代で変わる。** 業務名 (自由記述) は平成24年度ごろから、担当部署と実施地域図は平成21年度ごろから。令和7年 4〜8 月は業務名が欠ける。
    計画機関名は現在の組織名に置き換えて記録されている。
 4. **受付は契約の時点、工期は契約の窓。** 作業の時期や作業時間ではない ([term](term/summary.md))。
-5. **毎年同じことは、年の比較では情報がないが、地方の比較では北海道の特徴になりうる** ([annual](annual/summary.md)、[national](national/summary.md))。
+5. **毎年同じことは、年の比較では情報がないが、地方の比較では北海道の特徴になりうる。比べる単位は都道府県まで細かくする** (地方単位では冬の空白を固有と見誤った、[national2](national2/summary.md)) ([annual](annual/summary.md)、[national](national/summary.md))。
 
 ## レポート一覧 (推奨の読む順)
 
@@ -28,13 +28,14 @@
 | 3 | [長期の変化は取れるか — 見積もり](longterm/estimate.md) | どの年代まで遡って比べられるか | 比べる土台は平成21年度以降。それ以前は幅付き・参考 | [tables](longterm/tables.md) | D17 |
 | 4 | [飛び石で見た北海道の 15 年](stepping/summary.md) | 平成22・27年度、令和2・7年度で何が変わったか | 測量の構成は道路から農業へ (事業費の重心は動いていない)、上期集中の進行、十勝・空知への重心移動、日高の接続の持続 | [compare](stepping/compare.md)、[H22](h22/tables.md)・[H27](h27/tables.md)・[R2](r02/tables.md) | D18 |
 | 5 | [単年度の概況は「薄曇り」か「太陽は東から昇る」か](annual/summary.md) | 単年度の概況はどれだけ情報を持つか | 「最も多いのは〜」は自明か偶然のぶれ。「平年と比べて」は 17 年中 15 年に予想外があり、多くは予算・災害・施策、4 割ほどはレンズの変化。概況を「地勢」と「今年の天気」の 2 層で書く提案 | [overviews](annual/overviews.md)、[skill](annual/skill.md) | D20 |
-| 6 | [北海道の「地勢」は北海道に固有か](national/summary.md) | 毎年同じ特徴は北海道に固有か | 7 月の山・冬の空白は北海道に固有。農業が最大は農村型の地方に共通。市町村・民間の発注と固定資産の航空写真は 10 地方で最少 | [compare](national/compare.md) | D21 |
+| 6 | [北海道の「地勢」は北海道に固有か](national/summary.md) | 毎年同じ特徴は北海道に固有か | 7 月の山・冬の空白は北海道に固有 (冬の空白は 13 で修正)。農業が最大は農村型の地方に共通。市町村・民間の発注と固定資産の航空写真は 10 地方で最少 | [compare](national/compare.md) | D21 |
 | 7 | [受付の季節の形の分解](season/summary.md) | 夏の集中の強まりは全国一律か | 元からの地勢に、全国共通の前倒し (約半分) と北海道に固有の上乗せ (夏の山の鋭化、開発局の早期発注) が重なった | [compare](season/compare.md) | D23 |
 | 8 | [測量期間 (工期) の分析](term/summary.md) | 航空撮影は季節に従うか。工期はどう決まるか | 航空写真は春・レーザは晩秋に窓を開け、工期は 30〜45 日長い。工期は歩掛ではなく暦 (契約時期と旬の締め切り) で決まる | [tables](term/tables.md) | D22 |
 | 9 | [原因の分からない「予想外」4 件の掘り下げ](anomaly/summary.md) | annual で原因を「不明」に残した 4 件は何か | H23 空知は主に物差しと分母 (件数は平常)。H26 上川は国営 2 地区と道営の重なり、H28 釧路は道の事業の終わりの重なりで端境期の始まり。R4 上川は道の発注の谷の底で、契約は平常 (10 で届出の変化と判明) | [tables](anomaly/tables.md) | D24 |
 | 10 | [道の発注: 届出と委託契約の突き合わせ](contracts/summary.md) | 道の届出の増減は事業の増減か、届出の仕方の変化か | 令和6年度の倍増も令和4年度の上川の減少も、委託契約は動かず届出の比率が動いた (レンズ)。道の届出は道の予算の転換 (令和元〜2年度の増額) も写さない | [compare](contracts/compare.md) | D25 |
 | 11 | [開発局の補正予算・ゼロ国債と届出](supplementary/summary.md) | 補正予算は件数に写るか。ゼロ国債は冬の受付を作るか | 開発局の件数の増減は「当初 + 前年度の補正」と最もよく合う (相関 +0.70)。ゼロ国債は 1〜3 月の受付を作っていない | [compare](supplementary/compare.md) | D26 |
 | 12 | [地域 (振興局) の推移と、測量のない市町村](region/summary.md) | 振興局の割合はどう動いたか。測量のない市町村はどこか | 伸び続けているのは十勝だけ (道の発注)。空知・上川は令和5年度まで下がり、令和6年度の届出の段差で戻った。開発局の発注は東へ。毎年 6〜28 市町村に測量がなく、旧産炭地と島の町が続けて空白になる | [tables](region/tables.md) | D27 |
+| 13 | [北海道の季節の形は「固有」か「雪の勾配の端」か](national2/summary.md) | 6 を都道府県単位で掘り下げる | 冬の空白は雪国に共通で、北海道はその端。北海道に固有なのは 7 月への詰め込み (6〜8 月 63%、他は 15〜45%) で、分野・発注主体をそろえても残る。ただし際立ったのは令和5年度以降 | [tables](national2/tables.md) | D28 |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -56,6 +57,7 @@
 | r07・budget: 令和6年度の倍増は届出の増加と「みられる」(推定) | 道の委託契約が増えていないことで裏付け (推定から確認へ) | contracts (D25) |
 | budget: 件数は予算の転換点は写すが「年ごとの増減は合わない」 | 前年度の補正予算を足すと増減の相関は +0.31 → +0.70。合わなかった一部は補正を入れていなかったため | supplementary (D26) |
 | 飛び石: 「地域の重心は十勝・空知へ」 | 伸び続けているのは十勝だけ。空知の上昇は谷の年 (平成22年度) と令和6年度以降の届出の段差に挟まれた比較による | stepping §4 (D27) |
+| 地方の比較: 「冬の空白は北海道に固有」(2 月 z = −6.7) | 都道府県で比べると秋田・山形・青森など雪国に共通で、北海道はその端。固有なのは 7 月への集中で、それも令和5年度以降に際立った | national・annual (D28) |
 
 ## レビューで見てほしい点
 
@@ -94,4 +96,5 @@ python3 scripts/pref_contracts_compare.py # 10 reports/contracts/compare.md
 python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国債 → data/external/hkd-budget-supplementary.csv (PDF は data/raw/budget/hosei/)
 python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
 python3 scripts/region_trends.py          # 12 reports/region/tables.md
+python3 scripts/national_deep.py          # 13 reports/national2/tables.md
 ```
