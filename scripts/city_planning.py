@@ -11,6 +11,7 @@
 - 国の都市部の調査: 計画機関が国 (その他) で、業務名 (定型語) が「都市計画」のもの (平成20年度前後の国土交通省 地籍整備課の基準点測量)。
 - 市町村の地形図・航空写真 (参考): 市町村の発注で、業務名に「都市計画」の語はないが地形図・数値地形図・航空写真などを作るもの。
   都市計画図と固定資産・統合型 GIS の背景図を兼ねるものが多く、都市計画関係かは業務名から決められない。
+道の都市計画基礎調査 (T9) は data/external/hokkaido-toshikeikaku-kiso.csv (道の入札公告の業務処理要領の別表から手で写した表)。
 業務名は平成23年度ごろまで定型語 (「都市計画」) で、平成24年度ごろから自由記述になる (レンズの癖 3)。
 """
 import collections
@@ -151,6 +152,27 @@ for p_, ys in sorted(tb.items(), key=lambda x: (-len(x[1]), x[0])):
     if len(ys) >= 2:
         out.append(f'- {p_}: ' + '、'.join(era(y) for y in sorted(ys)))
 out.append('')
+# 道の都市計画基礎調査との照合
+kiso = list(csv.DictReader((ROOT / 'data/external/hokkaido-toshikeikaku-kiso.csv').open()))
+out.append('\n## T9. 道の都市計画基礎調査の対象と基準日 (令和7・8年度の入札公告の業務処理要領から)\n')
+out.append('| 実施年度 | 業務 | 都市計画区域 | 市町 | 前回の基準日 | 今回の基準日 | 市町の都市計画図の登録 (年度) |')
+out.append('|---|---|---|---|---|---|---|')
+for k in kiso:
+    ys = sorted({r['year'] for r in mp if r['planner'] == '北海道' + k['municipality']})
+    out.append(f'| {era(int(k["fiscal_year"]))} | {k["part"]} | {k["planning_area"]} | {k["municipality"]} | {k["previous_base_date"]} | {k["current_base_date"]} | '
+               + ('、'.join(era(y) for y in ys) or '—') + ' |')
+out.append(f'\n基礎調査そのものは公共測量として登録されていない (業務名に「基礎調査」を含む都市計画の測量は 0 件)。'
+           '建築確認と市町の地図データ (家屋所在図・地番図など) を集める調査で、測量を伴わない。\n')
+yy = [r['year'] for r in mp if 1985 <= r['year'] <= 2024]
+ph = collections.Counter(y % 5 for y in yy)
+exp = len(yy) / 5
+chi = sum((ph[k] - exp) ** 2 / exp for k in range(5))
+out.append('## T10. 都市計画図の更新と国勢調査の年 (昭和60〜令和6年度)\n')
+out.append('基礎調査の基準日は国勢調査 (10 月 1 日) にそろう。国勢調査の年度を 0 として、都市計画図の登録の年度のずれを数える。\n')
+out.append('| 国勢調査の年度からのずれ | 0 (国勢調査の年度) | +1 | +2 | +3 | +4 (国勢調査の前年度) |')
+out.append('|---|---:|---:|---:|---:|---:|')
+out.append('| 件数 | ' + ' | '.join(f'{ph[k]} ({100 * ph[k] / len(yy):.0f}%)' for k in range(5)) + ' |')
+out.append(f'\n一様なら各 20%。カイ二乗 {chi:.1f} (自由度 4、5% の棄却点 9.49)。\n')
 (ROOT / 'reports/cityplan').mkdir(parents=True, exist_ok=True)
 (ROOT / 'reports/cityplan/tables.md').write_text('\n'.join(out) + '\n')
 print('wrote reports/cityplan/tables.md')
