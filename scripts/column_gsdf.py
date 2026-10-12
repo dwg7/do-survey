@@ -63,6 +63,46 @@ out.append('|---|' + '---:|' * len(yrs))
 for s in 'ABCDEFGHIJ':
     out.append(f'| {s} | ' + ' | '.join(str(dc[(s, y)]) for y in yrs) + ' |')
 out.append('\n地方防衛局 (防衛省の地方の機関) は基地・演習場の用地・境界・移転措置の測量を外部に委託して出す。地理情報隊とは別の機関。\n')
+# 仮説 (hfu): 地理情報隊は直営を好み、地方防衛局は外注する。地方防衛局の全国・全年度の記録で作業者を分ける。
+import re  # noqa: E402
+db = json.loads((ROOT / 'data/raw/gsdf/defense-bureau-search.json').read_text())['items']
+db = [i for i in db if not (i['plannerName'] or '').startswith('国土地理院')]   # 複数機関の共同の 1 件を除く
+
+
+def wkind(w, p):
+    w = clean(w).replace(' ', '')
+    if not w or w == '未定':
+        return '記載なし・未定'
+    if '直営' in w or w in clean(p).replace(' ', ''):
+        return '直営 (計画機関自身)'
+    return '外部 (測量会社・財団など)'
+
+
+out.append('## G5. 仮説の検証: 作業者が計画機関自身か外部か\n')
+out.append(f'地方防衛局は検索 API を「防衛局」「防衛支局」で全国・全年度について引いた {len(db)} 件 '
+           f'(受付年度 {min(i["yearRecept"] for i in db)}〜{max(i["yearRecept"] for i in db)}、`data/raw/gsdf/defense-bureau-search.json`)。\n')
+gk = collections.Counter(wkind(i['workerName'], i['plannerName']) for i in items if '情報隊' in (i['plannerName'] or ''))
+dk = collections.Counter(wkind(i['workerName'], i['plannerName']) for i in db)
+cats = ['直営 (計画機関自身)', '外部 (測量会社・財団など)', '記載なし・未定']
+out.append('| 計画機関 | 件数 | ' + ' | '.join(cats) + ' |')
+out.append('|---|---:|' + '---:|' * len(cats))
+out.append(f'| 地理情報隊 (中央情報隊を含む) | {sum(gk.values())} | ' + ' | '.join(str(gk[c]) for c in cats) + ' |')
+out.append(f'| 地方防衛局・防衛支局 | {sum(dk.values())} | ' + ' | '.join(str(dk[c]) for c in cats) + ' |')
+K = [('移転措置・周辺対策', r'移転|周辺'), ('用地・境界', r'用地|境界|取得|買収|立木'), ('施設・宿舎', r'施設|宿舎|庁舎|建物'),
+     ('飛行場・基地の名だけ', r'飛行場|基地|演習場|駐屯地|分屯')]
+
+
+def pk(pu):
+    for n, pat in K:
+        if re.search(pat, pu or ''):
+            return n
+    return '定型語など (その他)'
+
+
+pc = collections.Counter(pk(i['purpose']) for i in db)
+out.append('\n**地方防衛局の目的**: ' + '、'.join(f'{k} {v}' for k, v in pc.most_common()) + '。'
+           '**測量の種類 (先頭)**: ' + '、'.join(f'{k} {v}' for k, v in collections.Counter(
+               clean((i['contentsType'] or '').split('</br>')[0]).replace('【大分類】', '').strip()[:10] for i in db).most_common(4)) + '。\n')
 (ROOT / 'reports/column').mkdir(parents=True, exist_ok=True)
 (ROOT / 'reports/column/gsdf-tables.md').write_text('\n'.join(out) + '\n')
 print('wrote reports/column/gsdf-tables.md')
