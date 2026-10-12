@@ -37,6 +37,7 @@
 | 12 | [地域 (振興局) の推移と、測量のない市町村](region/summary.md) | 振興局の割合はどう動いたか。測量のない市町村はどこか | 伸び続けているのは十勝だけ (道の発注)。空知・上川は令和5年度まで下がり、令和6年度の届出の段差で戻った。開発局の発注は東へ。毎年 6〜28 市町村に測量がなく、旧産炭地と島の町が続けて空白になる | [tables](region/tables.md) | D27 |
 | 13 | [北海道の季節の形は「固有」か「雪の勾配の端」か](national2/summary.md) | 6 を都道府県単位で掘り下げる | 冬の空白は雪国に共通で、北海道はその端。北海道に固有なのは 7 月への詰め込み (6〜8 月 63%、他は 15〜45%) で、分野・発注主体をそろえても残る。ただし際立ったのは令和5年度以降 | [tables](national2/tables.md) | D28 |
 | 14 | [人口千人前後の町村の公共測量は local か](smallvillage/summary.md) | 千人村の測量は道・国の事業に付随するものか、地域特有のものか | 主体では 96% が道・国で local でない (ただし北海道全体の構造)。受益では半分が村の土地と暮らし (道営農地・漁港・砂防・ダム)、半分が通過する広域の網。測量は人ではなく土地に付く | [tables](smallvillage/tables.md) | D29 |
+| 15 | [都市計画関係の公共測量](cityplan/summary.md) | 都市計画の測量は毎年何件か、年度の山はあるか | 年数件〜20 件台、88% が市町村の発注。都市計画図の更新は 7〜8 年周期で、帯広圏・函館圏など広域都市計画圏がそろって更新する年に山。固定資産の航空写真は 3 年周期 (評価替え) | [tables](cityplan/tables.md) | D30 |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -98,5 +99,6 @@ python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国
 python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
 python3 scripts/region_trends.py          # 12 reports/region/tables.md
 python3 scripts/national_deep.py          # 13 reports/national2/tables.md
+python3 scripts/city_planning.py          # 15 reports/cityplan/tables.md
 python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md (人口は data/raw/population/jumin-2026.xlsx、北海道統計課のページから)
 ```
