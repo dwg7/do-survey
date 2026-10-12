@@ -41,6 +41,11 @@
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
+## コラム
+
+- [地理情報隊の公共測量 (全国)](column/gsdf.md) — 陸上自衛隊 陸上総隊 中央情報隊 地理情報隊の届出は令和5年度からの 14 件で、ほぼすべて飛行場の 3 級基準点・水準測量。
+  作業者が計画機関自身 (直営) の、全国でほぼ唯一の計画機関 (D33)。
+
 ## 年度ごとの概況 (新しい型)
 
 [yearly/README.md](yearly/README.md) に、新しい年度から 1 年度ずつ書く (D32)。地勢 (毎年同じ) と今年の天気 (予想外の仕分け) の 2 層に、
@@ -105,6 +110,7 @@ python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
 python3 scripts/region_trends.py          # 12 reports/region/tables.md
 python3 scripts/national_deep.py          # 13 reports/national2/tables.md
 python3 scripts/yearly_tables.py 2025      # 年度ごとの根拠表 reports/yearly/r07/tables.md (年度を変えて)
+python3 scripts/column_gsdf.py            # コラム reports/column/gsdf-tables.md (data/raw/gsdf/ は検索 API を計画機関の語で引いた結果)
 python3 scripts/city_planning.py          # 15 reports/cityplan/tables.md
 python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md (人口は data/raw/population/jumin-2026.xlsx、北海道統計課のページから)
 ```
