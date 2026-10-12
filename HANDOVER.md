@@ -1,11 +1,11 @@
 # HANDOVER.md — 引き継ぎ (2026-10-08 時点)
 
-規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D28)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
+規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D29)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
 このファイルは「今どこまで進んでいて、次に何をするか」と、ファイルに書いていない作業の型だけを書く (都度まるごと書き直す)。
 
 ## 今の段階
 
-**hfu が `reports/README.md` からレポート 13 本を体系的に読み、フィードバックを考えている。** 次のやり取りはそのフィードバックへの
+**hfu が `reports/README.md` からレポート 14 本を体系的に読み、フィードバックを考えている。** 次のやり取りはそのフィードバックへの
 対応になる見込み。フィードバックは案内の番号 (例: 「5 の §3」) で来ることを想定し、直したら関連レポートと `reports/README.md` の
 「後のレポートで修正された主張」にも反映する。
 
@@ -13,11 +13,12 @@
 
 - データ: `data/surveys.parquet` (受付年度 1983〜2026 の 17,514 件、2026-09-24 取得、2026 年度は 9/17 受付分まで)。
 - ダッシュボード: https://dwg7.unopengis.org/do-survey/ (GitHub Pages、main の /docs)。D10〜D15。
-- 分析 (北海道測量概況): `reports/` の 13 本 (D16〜D28)。一覧・結論・修正された主張・レビューの観点は `reports/README.md`。
+- 分析 (北海道測量概況): `reports/` の 14 本 (D16〜D29)。一覧・結論・修正された主張・レビューの観点は `reports/README.md`。
 - 手元にだけあるデータ (`data/raw/`、コミットしない。消えたら `scripts/fetch.py` / `scripts/fetch_budget.py` で取り直せる):
   - 区分 A (北海道) の全年度 `A-1968.json`〜`A-2026.json`
   - 区分 B〜K の 2009・2014・2019・2023・2024・2025 年度 (K は 2023〜2025 のみ)
   - 開発局の当初予算の PDF `data/raw/budget/t2009.pdf`〜`t2025.pdf`
+  - 道の住民基本台帳人口の Excel `data/raw/population/jumin-2026.xlsx` (北海道統計課のページから手で取得。読むのは `scripts/xlsx_rows.py`)
   - 開発局の補正予算の PDF `data/raw/budget/hosei/` (`scripts/fetch_budget_supp.py`)
   - 道の予算のポイントと入札監視委員会の資料 1-1 の PDF `data/raw/budget/pref/` (`scripts/fetch_pref_contracts.py` で取り直せる。予算のポイントは手で取得)
 - `analysis/classified.csv` も派生物でコミットしない (`python3 scripts/classify.py` で全年度を作り直す、数十秒)。
@@ -43,6 +44,7 @@
 - 2026-10-08: 地域 (振興局) の推移と測量のない市町村 (D27、レポート 12)。手元のデータだけ。
 - 2026-10-12: hfu が「地勢は北海道に固有か」(レポート 6) を掘り下げたいと言い、都道府県単位の比較をした (D28、レポート 13)。手元のデータだけ。
   次は雪の量 (気象庁の平年値) で緯度の代わりを置き換える案がある (外部取得、未着手)。
+- 2026-10-12: hfu の問い (千人村の公共測量は local か) に答えた (D29、レポート 14)。人口は道の住民基本台帳 (令和8年1月1日) を取得。
 
 ## 次の候補
 
