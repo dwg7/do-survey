@@ -41,6 +41,11 @@
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
+## 年度ごとの概況 (新しい型)
+
+[yearly/README.md](yearly/README.md) に、新しい年度から 1 年度ずつ書く (D32)。地勢 (毎年同じ) と今年の天気 (予想外の仕分け) の 2 層に、
+予算と契約・地域・テーマの定点・レンズの注意を添える。
+
 ## 後のレポートで修正された主張
 
 先に書いたレポートの一部は、後の分析で直した (直した文はレポート本文にも反映済み)。読み違いを防ぐため一覧にする。
@@ -99,6 +104,7 @@ python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国
 python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
 python3 scripts/region_trends.py          # 12 reports/region/tables.md
 python3 scripts/national_deep.py          # 13 reports/national2/tables.md
+python3 scripts/yearly_tables.py 2025      # 年度ごとの根拠表 reports/yearly/r07/tables.md (年度を変えて)
 python3 scripts/city_planning.py          # 15 reports/cityplan/tables.md
 python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md (人口は data/raw/population/jumin-2026.xlsx、北海道統計課のページから)
 ```
