@@ -2,3 +2,4 @@ number,kind,value,note
 44.4,ref,reports/anomaly/tables.md,上川総合振興局の前 5 年度の平均 (T6)
 205,expr,(166+140+237+237+245)/5,開発局の平年 (平成29〜令和3年度)
 311,ref,reports/contracts/compare.md,旭川建設管理部の委託契約 (令和4年度)
+0.68,ref,reports/supplementary/compare.md,D26 の増減の相関 (D35 の後)

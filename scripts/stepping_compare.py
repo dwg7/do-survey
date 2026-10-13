@@ -165,6 +165,17 @@ for b in FOCUS:
     body.append(row)
 table('C8 6 地域の主な発注機関 (3 年度)', heads, body)
 
+# C9 開発局と道の件数の推移 (summary.md §2 の表の出どころ、D35)
+ys9 = list(range(2006, 2016))
+cnt9 = lambda f: [str(sum(1 for r in rows if int(r['year']) == y and f(r))) for y in ys9]
+heads9 = ['受付年度'] + [f'平成{y - 1988}' for y in ys9]
+body9 = [['開発局'] + cnt9(lambda r: r['planner_type'] == '北海道開発局'),
+         ['うち道路'] + cnt9(lambda r: r['planner_type'] == '北海道開発局' and r['field'] == '道路'),
+         ['うち農業農村'] + cnt9(lambda r: r['planner_type'] == '北海道開発局' and r['field'] == '農業農村'),
+         ['道 (参考)'] + cnt9(lambda r: r['planner_type'] == '北海道'),
+         ['道のうち道路'] + cnt9(lambda r: r['planner_type'] == '北海道' and r['field'] == '道路')]
+table('C9 開発局と道の件数の推移 (平成18〜27年度)', heads9, body9)
+
 (ROOT / 'reports/stepping').mkdir(parents=True, exist_ok=True)
 (ROOT / 'reports/stepping/compare.md').write_text('\n'.join(out) + '\n')
 print('wrote reports/stepping/compare.md')

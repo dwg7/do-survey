@@ -128,8 +128,11 @@ for r in mod:
     b = r['b']
     last = (b.replace(day=28) + dt.timedelta(days=4)).replace(day=1) - dt.timedelta(days=1)
     dd['月末' if b == last else (f'{b.day} 日' if b.day in (10, 15, 20, 25) else 'その他')] += 1
+d30 = sum(1 for r in mod if r['b'].day == 30 and (r['b'] + dt.timedelta(days=1)).day != 1)
+base3 = dd['10 日'] + dd['20 日'] + dd['月末']
 table('T5 終了日の「日」', ['日', '割合'], [[k, f'{100 * v / n:.1f}%'] for k, v in dd.most_common()],
-      '偶然なら 10 日・20 日・月末はそれぞれ約 3.3%。')
+      '偶然なら 10 日・20 日・月末はそれぞれ約 3.3%。'
+      f'10 日・20 日・月末の計 {100 * base3 / n:.0f}%。31 日の月の 30 日 (「その他」に入る) は {100 * d30 / n:.0f}% で、足すと {100 * (base3 + d30) / n:.0f}% (D35)。')
 md = collections.Counter(r['b'].strftime('%m/%d') for r in mod)
 table('T5b 終了日の上位', ['月日', '件数', '割合'], [[k, v, f'{100 * v / n:.1f}%'] for k, v in md.most_common(12)])
 

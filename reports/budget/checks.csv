@@ -1,0 +1,10 @@
+number,kind,value,note
+0.32,ref,reports/supplementary/compare.md,当初だけの増減の相関
+0.68,ref,reports/supplementary/compare.md,当初 + 前年度の補正の増減の相関
+2.6,expr,117/45,農業と道路の件数の比 (令和7年度)
+15,ref,reports/contracts/compare.md,産業振興部の届出の比率 令和5年度
+33,ref,reports/contracts/compare.md,同 令和6年度
+74,ref,reports/annual/overviews.md,上期の割合 平成27年度
+80,ref,reports/annual/overviews.md,上期の割合 令和2年度
+172,ref,reports/stepping/compare.md,道の道路の件数 平成21年度 (C9)
+1758,ref,reports/supplementary/compare.md,平成24年度の補正 (直轄)

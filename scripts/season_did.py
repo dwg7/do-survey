@@ -8,6 +8,7 @@
 発注主体の区分は scripts/national_compare.py と同じ (計画機関名から県名を除いた残り)。
 """
 import collections
+import csv
 import json
 import pathlib
 import re
@@ -74,6 +75,35 @@ out.append('| 指標 | 北海道の変化 | 他の 9 地方の平均の変化 | 
 out.append('|---|---:|---:|---:|')
 for k, (a, o, d) in res.items():
     out.append(f'| {k} | {a:+.0f} | {o:+.0f} | {d:+.0f} |')
+out.append('')
+# 北海道の上期の変化の分解 (構成の効果と分野の中の前倒し)。summary.md §6 の数の出どころ (D35)
+cl = [r for r in csv.DictReader((ROOT / 'analysis/classified.csv').open()) if r['recept_date']]
+A0 = [r for r in cl if int(r['year']) == 2009]
+A1 = [r for r in cl if int(r['year']) in (2023, 2024, 2025)]
+FIELDS = sorted({r['field'] for r in A0 + A1})
+
+
+def upshare(rs):
+    return sum(1 for r in rs if 4 <= int(r['recept_date'][5:7]) <= 9) / len(rs) if rs else 0
+
+
+w0 = {f: sum(1 for r in A0 if r['field'] == f) / len(A0) for f in FIELDS}
+w1 = {f: sum(1 for r in A1 if r['field'] == f) / len(A1) for f in FIELDS}
+u0 = {f: upshare([r for r in A0 if r['field'] == f]) for f in FIELDS}
+u1 = {f: upshare([r for r in A1 if r['field'] == f]) for f in FIELDS}
+total = 100 * (upshare(A1) - upshare(A0))
+comp = 100 * sum((w1[f] - w0[f]) * u0[f] for f in FIELDS)
+within = 100 * sum(w1[f] * (u1[f] - u0[f]) for f in FIELDS)
+comp2 = 100 * sum((w1[f] - w0[f]) * u1[f] for f in FIELDS)
+within2 = 100 * sum(w0[f] * (u1[f] - u0[f]) for f in FIELDS)
+out.append('\n## 北海道の上期の変化の分解 (平成21年度 → 令和5〜7年度)\n')
+out.append(f'上期の割合 {100 * upshare(A0):.0f}% → {100 * upshare(A1):.0f}% (変化 {total:+.0f})。'
+           f'構成の効果 (分野の構成の変化 × 平成21年度の分野ごとの上期の割合) {comp:+.0f}、分野の中の前倒し (令和5〜7年度の構成 × 上期の割合の変化) {within:+.0f}。'
+           f'順序を逆にすると (令和5〜7年度の上期の割合で構成の効果、平成21年度の構成で前倒し) {comp2:+.0f} と {within2:+.0f}。\n')
+out.append('| 分野 | 平成21年度の構成 | 令和5〜7年度の構成 | 平成21年度の上期 | 令和5〜7年度の上期 |')
+out.append('|---|---:|---:|---:|---:|')
+for f in sorted(FIELDS, key=lambda f: -w1[f])[:6]:
+    out.append(f'| {f} | {100 * w0[f]:.0f}% | {100 * w1[f]:.0f}% | {100 * u0[f]:.0f}% | {100 * u1[f]:.0f}% |')
 out.append('')
 (ROOT / 'reports/season').mkdir(parents=True, exist_ok=True)
 (ROOT / 'reports/season/compare.md').write_text('\n'.join(out) + '\n')

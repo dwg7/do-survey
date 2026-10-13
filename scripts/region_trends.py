@@ -81,6 +81,11 @@ for y in YEARS:
     cls = collections.Counter(active[c]['class'] for c in zero)
     low = sum(1 for c in active if 1 <= cnt[y][c] <= 2)
     out.append(f'| {era(y)} | {len(zero)} | {cls["市"]} | {cls["町"]} | {cls["村"]} | {low} |')
+tz = [sum(1 for c in active if cnt[y][c] == 0) for y in TREND]
+tt = [sum(1 for r in rows if r['year'] == y) for y in TREND]
+mz, mt_ = statistics.mean(tz), statistics.mean(tt)
+rz = sum((a - mz) * (b - mt_) for a, b in zip(tz, tt)) / (sum((a - mz) ** 2 for a in tz) * sum((b - mt_) ** 2 for b in tt)) ** .5
+out.append(f'\n測量のない市町村の数と全体の件数の相関 (平成21〜令和5年度): {rz:+.2f}。')
 allcls = collections.Counter(m['class'] for m in munis)
 out.append(f'\n179 市町村の内訳: 市 {allcls["市"]}・町 {allcls["町"]}・村 {allcls["村"]}。\n')
 

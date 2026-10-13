@@ -1,6 +1,6 @@
 # HANDOVER.md — 引き継ぎ (2026-10-08 時点)
 
-規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D34)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
+規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D35)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
 このファイルは「今どこまで進んでいて、次に何をするか」と、ファイルに書いていない作業の型だけを書く (都度まるごと書き直す)。
 
 ## 今の段階
@@ -52,6 +52,8 @@
 - 2026-10-13: hfu の依頼でコラム「地理情報隊の公共測量 (全国)」(D33、`reports/column/gsdf.md`)。検索 API を計画機関の語で引いた (`data/raw/gsdf/`)。
 - 2026-10-13: ハーネスの追加 (D34): 本文の数字の検査 `scripts/check_numbers.py` と発見の台帳 `reports/findings.csv` (`scripts/check_findings.py`)。
   hfu の指示の順: ハーネス → 平成30年度 → すでに実施した分析の検証・整理。
+- 2026-10-13: 平成30年度の概況 (D32)、検証と整理 (D35: 再現、計画機関の規則の穴、数字の検査の全レポートへの拡張、主張の再計算 `scripts/verify_findings.py`)。
+  次は年度ごとの概況の平成29年度。書いたら check_numbers・check_findings・verify_findings を通す。
 
 ## 次の候補
 
