@@ -220,6 +220,100 @@ if 2020 <= Y <= 2023:
     notes.append('道の届出の比率がなだらかに下がっていた時期 (D25)。道の件数の減少は契約の減少ではない。')
 out.append('\n' + '\n'.join(f'- {n}' for n in notes) + '\n' if notes else '')
 
+# ---- Y7 内訳 (本文で使う数の出どころ) ----
+# 会話の中でその場で問い合わせていた数を、ここで再現できるようにする (D34)。
+out.append('\n## Y7. 内訳\n')
+PT = ['北海道', '北海道開発局', '市町村', 'その他']
+FL = ['農業農村', '道路', '防災・治水', '公物管理', '地籍・登記・課税', '位置基盤', '都市・まちづくり', '行政情報']
+for yy in (Y - 1, Y):
+    rs = by_year[yy]
+    out.append(f'\n**{short(yy)}: 発注主体 × 分野 (件数)**\n')
+    out.append('| 発注主体 | 計 | ' + ' | '.join(FL) + ' | ほか |')
+    out.append('|---|---:|' + '---:|' * (len(FL) + 1))
+    for t in PT:
+        sub = [r for r in rs if (r['planner_type'] == t if t != 'その他' else r['planner_type'] not in PT[:3])]
+        fc_ = collections.Counter(r['field'] for r in sub)
+        out.append(f'| {t} | {len(sub)} | ' + ' | '.join(str(fc_[f]) for f in FL) + f' | {sum(v for f, v in fc_.items() if f not in FL)} |')
+    st_ = collections.Counter(r['stage'] for r in rs if r['planner_type'] == '北海道' and r['field'] == '農業農村')
+    out.append(f'\n道の農業農村の段階 ({short(yy)}): ' + '、'.join(f'{k} {v}' for k, v in st_.most_common()) + f' (計 {sum(st_.values())})')
+
+SUB = [('土砂・洪水氾濫対策', r'土砂・?洪水氾濫'), ('砂防メンテナンス', r'砂防.*メンテナンス|メンテナンス.*砂防'), ('災害復旧', r'災害復旧|災害関連|復旧'),
+       ('砂防・急傾斜・地すべり', r'砂防|地すべり|急傾斜|治山'), ('河川', r'河川|川.*改修|堤防|総合流域'), ('海岸', r'海岸|高潮'), ('ダム', r'ダム')]
+
+
+def subtype(r):
+    for n, pat in SUB:
+        if re.search(pat, r['purpose']):
+            return n
+    return 'その他'
+
+
+out.append('\n**道の防災・治水の内訳 (業務名の語、上から順に当てる)**\n')
+out.append('| 年度 | 計 | ' + ' | '.join(n for n, _ in SUB) + ' | その他 |')
+out.append('|---|---:|' + '---:|' * (len(SUB) + 1))
+for yy in (Y - 2, Y - 1, Y):
+    sub = [r for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '防災・治水']
+    c = collections.Counter(subtype(r) for r in sub)
+    out.append(f'| {short(yy)} | {len(sub)} | ' + ' | '.join(str(c[n]) for n, _ in SUB) + f' | {c["その他"]} |')
+
+out.append('\n**発注主体ごとの上期の割合と、複数市町村にまたがる割合**\n')
+out.append('| 年度 | 発注主体 | 件数 | 上期 | 上期の割合 | 複数市町村 | 複数の割合 |')
+out.append('|---|---|---:|---:|---:|---:|---:|')
+for yy in (Y - 2, Y - 1, Y):
+    for t in PT[:3]:
+        sub = [r for r in by_year[yy] if r['planner_type'] == t]
+        h = sum(1 for r in sub if r['half'] == '上期')
+        mm = sum(1 for r in sub if int(r['n_munis']) > 1)
+        out.append(f'| {short(yy)} | {t} | {len(sub)} | {h} | {pct(h / len(sub))} | {mm} | {pct(mm / len(sub))} |')
+for yy in (Y - 1, Y):
+    mc_ = collections.Counter(int(r['recept_date'][5:7]) for r in by_year[yy] if r['recept_date'])
+    out.append(f'\n{short(yy)} の受付の月別件数: ' + '、'.join(f'{m} 月 {mc_[m]}' for m in (4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3))
+               + f' (4〜6 月 {sum(mc_[m] for m in (4, 5, 6))}、10〜12 月 {sum(mc_[m] for m in (10, 11, 12))})')
+
+out.append('\n**計画機関の上位 (件数、前年度と今年)**\n')
+pc0 = collections.Counter(r['planner'] for r in by_year[Y - 1])
+pc1 = collections.Counter(r['planner'] for r in rows)
+out.append('| 計画機関 | 前年度 | 今年 |')
+out.append('|---|---:|---:|')
+for pl, n in pc1.most_common(15):
+    out.append(f'| {pl} | {pc0[pl]} | {n} |')
+
+out.append('\n**件数の多い市町村の中身 (上位 8、発注主体 × 分野の上位 3)**\n')
+for c_, n in mcnt.most_common(8):
+    sub = [r for r in rows if c_ in r['ml']]
+    top = collections.Counter((r['planner_type'], r['field']) for r in sub).most_common(3)
+    out.append(f'- {active[c_]["fullName"]} {n} (前年度 {prev[c_]}): ' + '、'.join(f'{t}・{f} {v}' for (t, f), v in top))
+
+out.append('\n**振興局ごとの発注主体 (件数)**\n')
+out.append('| 振興局 | 計 | 道 | 開発局 | 市町村 |')
+out.append('|---|---:|---:|---:|---:|')
+for b in sorted(BUREAUS, key=lambda b: -bc[b]):
+    sub = [r for r in rows if b in r['bl']]
+    out.append(f'| {b} | {len(sub)} | ' + ' | '.join(str(sum(1 for r in sub if r['planner_type'] == t)) for t in PT[:3]) + ' |')
+
+ALLY = range(2009, 2026)
+
+
+def series(fn):
+    return '、'.join(f'{short(yy)} {fn(yy)}' for yy in ALLY)
+
+
+def mshare(yy, ms):
+    rs = [r for r in by_year[yy] if r['recept_date']]
+    return pct(sum(1 for r in rs if int(r['recept_date'][5:7]) in ms) / len(rs))
+
+
+out.append('\n**平成21〜令和7年度の推移 (「最多」「最も高い」の確かめ用)**\n')
+out.append('- 件数: ' + series(lambda yy: len(by_year[yy])))
+out.append('- 6〜8 月の割合: ' + series(lambda yy: mshare(yy, (6, 7, 8))))
+out.append('- 7 月の割合: ' + series(lambda yy: mshare(yy, (7,))))
+out.append('- 道の件数: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道')))
+out.append('- 開発局の件数: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道開発局')))
+out.append('- 開発局の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy] if r['planner_type'] == '北海道開発局') / len(by_year[yy]))))
+out.append('- 道の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy] if r['planner_type'] == '北海道') / len(by_year[yy]))))
+out.append('- 航空レーザ: ' + series(lambda yy: sum(1 for r in by_year[yy] if '航空レーザ' in r['kinds'])))
+out.append('- 測量のない市町村: ' + series(lambda yy: sum(1 for c_ in active if not any(c_ in r['ml'] for r in by_year[yy]))))
+
 d = ROOT / f'reports/yearly/{short(Y).lower().replace("r", "r0") if Y >= 2019 and Y - 2018 < 10 else short(Y).lower()}'
 d.mkdir(parents=True, exist_ok=True)
 (d / 'tables.md').write_text('\n'.join(out) + '\n')
