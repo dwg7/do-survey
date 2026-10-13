@@ -284,6 +284,14 @@ for c_, n in mcnt.most_common(8):
     top = collections.Counter((r['planner_type'], r['field']) for r in sub).most_common(3)
     out.append(f'- {active[c_]["fullName"]} {n} (前年度 {prev[c_]}): ' + '、'.join(f'{t}・{f} {v}' for (t, f), v in top))
 
+out.append('\n**件数の多い市町村の受付の月 (上位 5)**\n')
+for c_, n in mcnt.most_common(5):
+    mm_ = collections.Counter(int(r['recept_date'][5:7]) for r in rows if c_ in r['ml'] and r['recept_date'])
+    out.append(f'- {active[c_]["fullName"]} {n}: ' + '、'.join(f'{m} 月 {mm_[m]}' for m in (4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3) if mm_[m])
+               + f' (10〜3 月 {sum(mm_[m] for m in (10, 11, 12, 1, 2, 3))})')
+win = [r for r in rows if r['recept_date'][5:7] in ('01', '02', '03')]
+wb = collections.Counter(b for r in win for b in r['bl'])
+out.append(f'\n**冬 (1〜3 月) の受付 {len(win)} 件の振興局**: ' + ('、'.join(f'{b} {n}' for b, n in wb.most_common()) or 'なし'))
 out.append('\n**振興局ごとの発注主体 (件数)**\n')
 out.append('| 振興局 | 計 | 道 | 開発局 | 市町村 |')
 out.append('|---|---:|---:|---:|---:|')
@@ -311,6 +319,8 @@ out.append('- 道の件数: ' + series(lambda yy: sum(1 for r in by_year[yy] if 
 out.append('- 開発局の件数: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道開発局')))
 out.append('- 開発局の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy] if r['planner_type'] == '北海道開発局') / len(by_year[yy]))))
 out.append('- 道の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy] if r['planner_type'] == '北海道') / len(by_year[yy]))))
+out.append('- 位置基盤: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['field'] == '位置基盤')))
+out.append('- 冬 (1〜3 月) の受付: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['recept_date'][5:7] in ('01', '02', '03'))))
 out.append('- 航空レーザ: ' + series(lambda yy: sum(1 for r in by_year[yy] if '航空レーザ' in r['kinds'])))
 out.append('- 測量のない市町村: ' + series(lambda yy: sum(1 for c_ in active if not any(c_ in r['ml'] for r in by_year[yy]))))
 
