@@ -296,7 +296,7 @@ sb = [b for b in BUREAUS if abs(z(Y, f'地域:{b}')) >= 2]
 for b in sb:
     c0 = collections.Counter((r['planner_type'], r['field']) for r in by_year[Y - 1] if b in r['bl'])
     c1 = collections.Counter((r['planner_type'], r['field']) for r in rows if b in r['bl'])
-    keys = sorted(set(c0) | set(c1), key=lambda k: -abs(c1[k] - c0[k]))[:6]
+    keys = sorted(set(c0) | set(c1), key=lambda k: (-abs(c1[k] - c0[k]), k))[:6]   # 同点は名前の順 (集合の並びは実行ごとに変わる)
     out.append(f'\n**平年から外れた振興局の内訳: {b}** (前年度 → 今年、差の大きい順): '
                + '、'.join(f'{t}・{f} {c0[(t, f)]} → {c1[(t, f)]}' for t, f in keys))
     big = max(keys, key=lambda k: c1[k] - c0[k])

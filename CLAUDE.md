@@ -9,6 +9,7 @@
 このリポジトリはその元データ (GeoParquet) を作り、ビューは 2 つを別々の機会に入れる:
 市町村名のビュー = tabularmaps/do の Open MCT ダッシュボード、ポリゴンのビュー = bvmap-starlight の MapLibre GL JS。
 将来は GeoParquet を Open MCT 経由でウェブから問い合わせられるようにする。
+あわせて、公共測量を観測窓に「北海道で何が行われているか」を読む分析 (北海道測量概況) を `reports/` に書く (D16〜)。
 
 ## データの流れ
 
@@ -18,11 +19,18 @@
 2. `scripts/build.py`: 正規化して `data/surveys.parquet` (GeoParquet 1.0.0) と、ダッシュボード用の
    `docs/data/matrix.json` (受付年度 × 市町村の件数、計画機関別の内訳付き)・`docs/data/summary.json` を作る。
    冗長なキーは一致を assert してから捨てる。読み替えできない名前があっても止めず、`unresolved_names` に残す。
+3. 分析で使う外部の資料は、取得のスクリプトが `data/raw/` に原本を保存し、抜き出した表を `data/external/` (出典 URL 付き) に書く:
+   開発局の当初予算 `fetch_budget.py`・補正予算 `fetch_budget_supp.py`、道の委託契約 `fetch_pref_contracts.py`。道の予算のポイント・
+   住民基本台帳人口・都市計画基礎調査の業務処理要領は手で取得し、表に写した時は写した元を表に書く。外部サイトへの取得は 1 秒間隔。
+4. 他の地方 (区分 B〜K) は `fetch.py --section <区分> --years ...` で `data/raw/<区分>-<年度>.json` に取る (GeoParquet にはしない)。
+   計画機関の語で全国・全年度を引く時は、検索 API の `PlanOrgKeywords` に語を入れ、`JyogenYear`・`JyogenSection` を空にする (D33)。
 
 ## コミットするもの
 
-- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、`analysis/*-rules.csv`、`data/external/` (外部資料から抜き出した表、出典 URL 付き)、`reports/`、ドキュメント。
-- しない: `data/raw/` (27MB、`fetch.py` で再現できる。予算の PDF `data/raw/budget/` も)、`analysis/classified.csv` (`classify.py` の派生物)。
+- する: `data/surveys.parquet`、`data/name-aliases.csv`、`scripts/`、`docs/` (ダッシュボードとその集計)、`analysis/*-rules.csv`、
+  `data/external/` (外部資料から抜き出した表、出典 URL 付き)、`reports/` (根拠表・本文・`checks.csv`・発見の台帳 `findings.csv`)、ドキュメント。
+- しない: `data/raw/` (公共測量実施情報の JSON、予算・契約の PDF、人口の Excel、基礎調査の PDF、計画機関の語で引いた結果。取得のスクリプトか
+  HANDOVER の手順で取り直せる)、`analysis/classified.csv` (`classify.py` の派生物)。
 
 ## 市町村の照合
 
@@ -53,28 +61,50 @@
 
 ## 分析 (北海道測量概況)
 
-- `scripts/classify.py` が `analysis/*-rules.csv` を上から順に当てて分類する。ねらいは「計画機関 → 業務名 → 担当部署
-  (と計画機関名)」の順で最初に当たった規則。`section_pattern` のある規則は担当部署も当たる時だけ有効。結果の
-  `analysis/classified.csv` は派生物でコミットしない。
-- 規則を変えたら、決まらない案件 (`*-none`、classify.py が表示) が増えていないことと、無作為抽出での読み合わせをやり直し、DECISIONS に書く。
-  2026-10-13 (D35) の時点で、計画機関は 0 件。ねらいは 1,237 件 (業務名が定型語だけの平成23年度以前がほとんどで、平成24年度以降は 28 件)、
-  段階は 3,450 件 (平成24年度以降 756 件、令和7年度 64 件)。ねらいと段階の「不明」は業務名から決められない案件で、0 にはしない。
-- 規則を変えたら、全スクリプトを流し直し、`git diff` で根拠表の変化を見てから `scripts/check_numbers.py` と `scripts/verify_findings.py` を通す (D35)。
-- 素案 `reports/r07/draft.md` の数字は必ず `reports/r07/tables.md` (`scripts/r07_tables.py` の生成物) か、そこから再計算できる値にする。
-- 根拠表の中身は `scripts/year_tables.py` (受付年度を引数に取る)。変えたら `r07_tables.py` の出力が変わらないかを確かめ、変わるなら素案の数字も同じコミットで直す。
+### 分類
+
+- `scripts/classify.py` が `analysis/*-rules.csv` を上から順に当てて、発注主体 (planner)・分野とねらい (aim)・段階 (stage) を決める。
+  ねらいは「計画機関 → 業務名 → 担当部署 (と計画機関名)」の順で最初に当たった規則。`section_pattern` のある規則は担当部署も当たる時だけ有効。
+  結果の `analysis/classified.csv` は派生物でコミットしない。
+- 規則の pattern は正規表現。CSV の列を割るので `{1,6}` のようなカンマを含む書き方は使わない (D35)。
+- 決まらない案件 (`*-none`、classify.py が表示) は、計画機関 0 件。ねらい 1,237 件 (平成23年度以前の定型語がほとんどで、平成24年度以降は 28 件)、
+  段階 3,450 件 (平成24年度以降 756 件)。ねらいと段階の「不明」は業務名から決められない案件として残す (D35 の時点の値)。
+- 規則を変えたら: 決まらない案件が増えていないこと、無作為抽出での読み合わせ、全スクリプトの流し直しと `git diff` での根拠表の変化の確認、
+  下の検査をして、DECISIONS に書く。
+
+### 根拠表
+
+- 各レポートの数は、そのフォルダの根拠表 (`tables.md`・`compare.md` など、`scripts/` の生成物) から引く。本文に数の表を置く時も根拠表の値を写し、
+  推移の表のような根拠表の写しでない表は、根拠表の生成に移す (stepping の C9、D35)。
+- 年度ごとの概況 (`reports/yearly/<r07・h30 など>/`) の根拠表は `scripts/yearly_tables.py <受付年度>`。型は `reports/yearly/README.md` (D32)。
+- 令和7年度の旧素案 `reports/r07/draft.md` の根拠表は `scripts/r07_tables.py` (中身は `scripts/year_tables.py`、受付年度を引数に取る)。
+  `year_tables.py` を変えたら `r07_tables.py` の出力が変わらないかを確かめ、変わるなら素案の数字も同じコミットで直す。
+
+### 書き方
+
 - 長期の比較は平成21年度以降を土台にする (D17)。平成22年度は業務名がなく、事業の種類と段階は比べない。
 - 件数は「測量の需要」であって事業の規模ではない。件数の増減を事業の増減として読むのは、100 億円あたりの件数 (密度) が安定している区間・分野だけ (D19)。
-- 件数は規模ではない、受付は契約時点、令和7年 4〜8 月は業務名の欠落がある、実施地域図の面積は作業範囲の外形、を前提として書く。
-- 年度ごとの概況 (`reports/yearly/<年度>/summary.md`) を書いたら `python3 scripts/check_numbers.py` を通す (D34)。本文の 2 桁以上の数は、
-  根拠表 (`scripts/yearly_tables.py` の tables.md) にあるか、同じフォルダの `checks.csv` に式 (expr) か参照先 (ref) を書く。
-  会話の中で問い合わせた数は、根拠表の生成 (Y7 内訳など) に足して再現できるようにするのが先。
-- 発見は `reports/findings.csv` (発見の台帳) に 1 行ずつ置き、状態 (確認・集計・推定・否定・置き換え) を保つ。覆した主張は「否定」か「置き換え」にして
-  置き換えた発見を書く。変えたら `python3 scripts/check_findings.py` を通す (`reports/findings.md` を生成する) (D34)。
+  道の届出は届出の運用で揺れる (D25)。開発局の件数は「当初 + 前年度の補正」と合わせて読む (D26)。
+- 受付は契約の時点、工期は契約の窓、令和7年 4〜8 月は業務名の欠落がある、実施地域図の面積は作業範囲の外形、を前提として書く。
+- 推定は推定と書き、外部資料で確かめることを「要確認」に残す。覆した主張は本文を直し、`reports/README.md` の「後のレポートで修正された主張」と台帳に残す。
+
+### 検査 (D34・D35)
+
+本文を書いたら、次の 3 つを通してからコミットする。
+
+- `python3 scripts/check_numbers.py`: 本文 (各フォルダの `summary.md`) の 2 桁以上の数と小数が、同じフォルダの根拠表にあるか、`checks.csv` の
+  式 (expr、使う数も根拠表にあること) か参照先 (ref) で裏付けられること。会話の中で問い合わせた数は、まず根拠表の生成に足す。
+  限界: どの項目の数かまでは見ないので、手の照合も続ける。
+- `python3 scripts/check_findings.py`: 発見の台帳 `reports/findings.csv` (1 行 1 発見、状態は 確認・集計・推定・否定・置き換え) の検査と
+  `reports/findings.md` の生成。新しい発見は台帳に足し、覆した発見は「否定」か「置き換え」にして置き換えた発見を書く。
+- `python3 scripts/verify_findings.py`: 台帳の主な主張を、根拠表とは別に書いた計算で元データから再現する。数量の主張を台帳に足したら、ここにも足す。
 
 ## 出典表記
 
 公共データ利用規約 (第 1.0 版) に従い、「出典: 国土地理院ウェブサイト「公共測量実施情報」 (URL)」と、
 dwg7 が編集・加工したことを併記する。加工したデータを国土地理院が作成したように見せない。
+分析で使う他の資料 (北海道開発局「予算概要」、北海道「予算の概要」・北海道入札監視委員会の資料・「住民基本台帳人口・世帯数」・
+都市計画基礎調査の業務処理要領) も、レポートと `data/external/` の表に出典を書き、dwg7 が抜き出し・加工したことを併記する。
 
 ## tabularmaps/do の取り込み
 

@@ -117,39 +117,55 @@
 - **推定の強さ**: 原因の推定 (予算・災害・届出・記録の形) のうち、外部資料で裏が取れていないもの。各レポートの「残り」「要確認」に列挙。
 - **概況の 2 層の書き方** (地勢 + 今年の天気) が、読み手 (行政・業界・一般) にとって有用か ([annual](annual/summary.md))。
 - **件数の読み方**: 件数を「測量の需要」として読むことの是非と、密度の扱い ([budget](budget/summary.md))。
+- **発見の台帳の状態**: 「確認」「集計」「推定」の付け方が妥当か ([findings.md](findings.md))。「推定」の行が要確認の一覧になる。
+- **年度ごとの概況の型**: 予想外を出来事とレンズに仕分ける書き方が、年度を重ねて読む時に役に立つか ([yearly](yearly/README.md))。
 
 ## まだやっていないこと (時系列の筋の残り)
 
 - 密度 (100 億円あたりの件数) で補正した分野の推移
-- 出来事の年表 (原因の分からない予想外 4 件は [anomaly](anomaly/summary.md) で掘り下げ済み。令和4年度の上川は未確定)
+- 出来事の年表 (原因の分からない予想外 4 件は [anomaly](anomaly/summary.md) と [contracts](contracts/summary.md) で掘り下げ済み。年度ごとの出来事は [yearly](yearly/README.md) に積み上がっている)
 - 人口・面積あたりの件数 (測量のない市町村が「小さいから」か「事業がないから」か)。地域の推移と測量のない市町村は 12 で済み
 - 分野別の補正予算と分野別の届出 (補正の総額は 11、道の当初予算の推移と委託契約は 10 で取得済み)
 
 ## 再現
 
+公共測量実施情報の取得 (`scripts/fetch.py`) と GeoParquet の作成 (`scripts/build.py`) はリポジトリの [README](../README.md)。外部サイトへの取得は 1 秒間隔。
+
 ```bash
-python3 scripts/classify.py          # 発注主体・分野・ねらい (行政目的 6 分類)・段階に分類 → analysis/classified.csv
-python3 scripts/r07_tables.py        # 1 の根拠表 reports/r07/tables.md
-python3 scripts/fetch_budget.py      # 開発局の当初予算 → data/external/hkd-budget-initial.csv (PDF は data/raw/budget/)
-python3 scripts/budget_compare.py    # 2 reports/budget/compare.md
-python3 scripts/longterm_tables.py   # 3 reports/longterm/tables.md
-python3 scripts/year_tables.py 2010 reports/h22/tables.md   # 任意の年度の根拠表 (r07_tables.py は 2025 の版)
-python3 scripts/stepping_compare.py  # 4 reports/stepping/compare.md
-python3 scripts/annual_overview.py   # 5 reports/annual/overviews.md・skill.md
+# 分類
+python3 scripts/classify.py          # 発注主体・分野とねらい・段階 → analysis/classified.csv (派生物)
+
+# 外部資料・他の地方のデータの取得 (data/raw/ に原本、data/external/ に表)
+python3 scripts/fetch_budget.py           # 開発局の当初予算 → data/external/hkd-budget-initial.csv
+python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国債 → data/external/hkd-budget-supplementary.csv
+python3 scripts/fetch_pref_contracts.py   # 道の委託・工事の契約 → data/external/hokkaido-pref-contracts-h1.csv
 for s in B C D E F G H I J K; do python3 scripts/fetch.py --section $s --years 2023 2024 2025; done   # 他の地方
-python3 scripts/national_compare.py  # 6 reports/national/compare.md
 for s in B C D E F G H I J; do python3 scripts/fetch.py --section $s --years 2009 2014 2019; done
-python3 scripts/season_did.py        # 7 reports/season/compare.md
-python3 scripts/term_analysis.py     # 8 reports/term/tables.md
-python3 scripts/anomaly_drill.py     # 9 reports/anomaly/tables.md
-python3 scripts/fetch_pref_contracts.py   # 道の委託・工事の契約 → data/external/hokkaido-pref-contracts-h1.csv (PDF は data/raw/budget/pref/)
+# 手で取得するもの: 道の住民基本台帳人口 (data/raw/population/jumin-2026.xlsx)、道の予算のポイント、
+# 都市計画基礎調査の業務処理要領、計画機関の語で引いた結果 (data/raw/gsdf/)。取り方は HANDOVER.md と各 D 番号。
+
+# レポートの根拠表 (番号は上の一覧)
+python3 scripts/r07_tables.py             # 1 reports/r07/tables.md
+python3 scripts/budget_compare.py         # 2 reports/budget/compare.md
+python3 scripts/longterm_tables.py        # 3 reports/longterm/tables.md
+python3 scripts/stepping_compare.py       # 4 reports/stepping/compare.md
+for a in "2010 reports/h22" "2015 reports/h27" "2020 reports/r02"; do set -- $a; python3 scripts/year_tables.py $1 $2/tables.md; done   # 4 の各年度
+python3 scripts/annual_overview.py        # 5 reports/annual/overviews.md・skill.md
+python3 scripts/national_compare.py       # 6 reports/national/compare.md
+python3 scripts/season_did.py             # 7 reports/season/compare.md
+python3 scripts/term_analysis.py          # 8 reports/term/tables.md
+python3 scripts/anomaly_drill.py          # 9 reports/anomaly/tables.md
 python3 scripts/pref_contracts_compare.py # 10 reports/contracts/compare.md
-python3 scripts/fetch_budget_supp.py      # 開発局の補正予算・ゼロ国債 → data/external/hkd-budget-supplementary.csv (PDF は data/raw/budget/hosei/)
 python3 scripts/budget_supp_compare.py    # 11 reports/supplementary/compare.md
 python3 scripts/region_trends.py          # 12 reports/region/tables.md
 python3 scripts/national_deep.py          # 13 reports/national2/tables.md
-python3 scripts/yearly_tables.py 2025      # 年度ごとの根拠表 reports/yearly/r07/tables.md (年度を変えて)
-python3 scripts/column_gsdf.py            # コラム reports/column/gsdf-tables.md (data/raw/gsdf/ は検索 API を計画機関の語で引いた結果)
+python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md
 python3 scripts/city_planning.py          # 15 reports/cityplan/tables.md
-python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md (人口は data/raw/population/jumin-2026.xlsx、北海道統計課のページから)
+python3 scripts/column_gsdf.py            # コラム reports/column/gsdf-tables.md
+for y in $(seq 2017 2025); do python3 scripts/yearly_tables.py $y; done   # 年度ごとの概況 reports/yearly/<年度>/tables.md
+
+# 検査 (CLAUDE.md の「検査」)
+python3 scripts/check_numbers.py          # 本文の数が根拠表と checks.csv で裏付けられるか
+python3 scripts/check_findings.py         # 発見の台帳の検査と reports/findings.md の生成
+python3 scripts/verify_findings.py        # 台帳の主張を元データから計算し直す
 ```
