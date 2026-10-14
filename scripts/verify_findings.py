@@ -168,6 +168,10 @@ check('F35', '開発局の農業 R5 → R7、道路・防災・公物 R6 → R7'
 w30 = [r for r in yr(2018) if r['m'] in (1, 2, 3)]
 check('F49', '平成30年度の冬の受付・うち胆振・平成29年度', (len(w30), sum(1 for r in w30 if '胆振' in r['bur']), sum(1 for r in yr(2017) if r['m'] in (1, 2, 3))), (23, 16, 6))
 check('F50', '道の農業農村 H29 → H30', tuple(sum(1 for r in yr(y) if r['planner_type'] == '北海道' and r['field'] == '農業農村') for y in (2017, 2018)), (118, 156))
+tk = lambda y: sum(1 for r in yr(y) if '十勝' in r['bur'] and r['planner_type'] == '北海道' and r['field'] == '防災・治水')
+check('F54', '十勝の道の防災・治水 H28 → H29', (tk(2016), tk(2017)), (9, 45))
+rd = lambda y, t: sum(1 for r in yr(y) if r['field'] == '道路' and r['planner_type'] == t)
+check('F55', '道路の測量 道・開発局・市町村 H28 → H29', tuple((rd(2016, t), rd(2017, t)) for t in ('北海道', '北海道開発局', '市町村')), ((62, 46), (45, 29), (29, 24)))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 

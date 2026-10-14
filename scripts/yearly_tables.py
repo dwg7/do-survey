@@ -292,6 +292,18 @@ for c_, n in mcnt.most_common(5):
 win = [r for r in rows if r['recept_date'][5:7] in ('01', '02', '03')]
 wb = collections.Counter(b for r in win for b in r['bl'])
 out.append(f'\n**冬 (1〜3 月) の受付 {len(win)} 件の振興局**: ' + ('、'.join(f'{b} {n}' for b, n in wb.most_common()) or 'なし'))
+sb = [b for b in BUREAUS if abs(z(Y, f'地域:{b}')) >= 2]
+for b in sb:
+    c0 = collections.Counter((r['planner_type'], r['field']) for r in by_year[Y - 1] if b in r['bl'])
+    c1 = collections.Counter((r['planner_type'], r['field']) for r in rows if b in r['bl'])
+    keys = sorted(set(c0) | set(c1), key=lambda k: -abs(c1[k] - c0[k]))[:6]
+    out.append(f'\n**平年から外れた振興局の内訳: {b}** (前年度 → 今年、差の大きい順): '
+               + '、'.join(f'{t}・{f} {c0[(t, f)]} → {c1[(t, f)]}' for t, f in keys))
+    big = max(keys, key=lambda k: c1[k] - c0[k])
+    if c1[big] - c0[big] <= 0:
+        continue
+    pp = collections.Counter(re.sub(r'[（(].*', '', r['purpose'])[:14] for r in rows if b in r['bl'] and (r['planner_type'], r['field']) == big)
+    out.append(f'  - 最も増えた {big[0]}・{big[1]} の業務名 (先頭 14 字): ' + '、'.join(f'{k} ({v})' for k, v in pp.most_common(8)))
 out.append('\n**振興局ごとの発注主体 (件数)**\n')
 out.append('| 振興局 | 計 | 道 | 開発局 | 市町村 |')
 out.append('|---|---:|---:|---:|---:|')
