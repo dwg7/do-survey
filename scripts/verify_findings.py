@@ -195,6 +195,21 @@ kd = lambda y: sum(1 for r in yr(y) if r['planner_type'] == '北海道開発局'
 check('F66', '開発局の届出 H21 → H22 と減り方 (%)', (kd(2009), kd(2010), round(100 * (kd(2009) - kd(2010)) / kd(2009))), (229, 71, 69))
 hs = lambda y: p(sum(1 for r in yr(y) if r['m'] in (4, 5, 6, 7, 8, 9)), sum(1 for r in yr(y) if r['m']))
 check('F67', '上期の割合 H16〜H20 の最小・最大と H21 (%)', (min(hs(y) for y in range(2004, 2009)), max(hs(y) for y in range(2004, 2009)), hs(2009)), (61, 63, 69))
+# F69〜F71: 長期概況 (D39)
+evs = list(csv.DictReader((ROOT / 'reports/overview/events.csv').open()))
+ekc = collections.Counter(e['kind'] for e in evs)
+mid = [e for e in evs if 2014 <= int(e['year']) <= 2023]
+check('F69', '仕分けの数 (出来事・レンズ・物差し・構成・不明) と平成26〜令和5年度の出来事 / 予想外',
+      (len(evs), ekc['出来事'], ekc['レンズ'], ekc['物差し・構成'], ekc['不明'], sum(1 for e in mid if e['kind'] == '出来事'), len(mid)), (49, 16, 14, 13, 6, 13, 22))
+def mavg(ys, ms):
+    return round(100 * statistics.mean(sum(1 for r in yr(y) if r['m'] in ms) / sum(1 for r in yr(y) if r['m']) for y in ys))
+PER = (range(2009, 2012), range(2019, 2024), range(2024, 2026))
+check('F70', '6〜8 月・7 月・上期・冬の期間平均 (%)', tuple(tuple(mavg(ys, ms) for ys in PER) for ms in ((6, 7, 8), (7,), (4, 5, 6, 7, 8, 9), (1, 2, 3))),
+      ((44, 57, 65), (16, 24, 29), (67, 79, 86), (5, 1, 1)))
+FL6 = ('農業農村', '道路', '防災・治水', '公物管理', '地籍・登記・課税', '位置基盤')
+topf = lambda y: collections.Counter(r['field'] for r in yr(y) if r['field'] in FL6).most_common(1)[0][0]
+check('F71', '最大の分野が道路の年度・農業農村の年度', (tuple(y for y in range(2009, 2026) if topf(y) == '道路'), min(y for y in range(2009, 2026) if topf(y) == '農業農村'),
+      all(topf(y) == '農業農村' for y in range(2012, 2026))), ((2009, 2010, 2011), 2012, True))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 

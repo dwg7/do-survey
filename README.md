@@ -22,7 +22,8 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 レンズの癖、テーマ別の索引、後で修正した主張、検証の記録、再現の手順)。
 
 - 結論を一覧で読む: [発見の台帳](reports/findings.md) (主な発見を 1 行ずつ、状態と根拠つき)
-- 年度ごとに読む: [年度ごとの北海道測量概況](reports/yearly/README.md) (令和7年度から 1 年度ずつ、地勢と今年の天気の 2 層)
+- 全期間を読む: [長期概況 (平成21〜令和7年度)](reports/overview/summary.md) (17 年の地勢の変化と出来事の表)
+- 年度ごとに読む: [年度ごとの北海道測量概況](reports/yearly/README.md) (令和7〜平成21年度の 17 年度、地勢と今年の天気の 2 層)
 - 方法: [ハーネスは分析の質を上げるか](reports/meta/harness.md) (本文の数字の検査・発見の台帳・主張の再計算)
 
 ## データ
