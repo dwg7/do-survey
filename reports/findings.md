@@ -51,7 +51,7 @@
 | F40 | 道の届出は道の予算の転換を写さない (令和元〜2年度の 3 割増でも届出は増えない) | [contracts/summary.md](contracts/summary.md) | 北海道 予算の概要 | 2018-2022 | D25 |  |
 | F41 | 地理情報隊の公共測量の届出は令和5年度からの 14 件で、ほぼすべて飛行場の測量を直営で行う | [column/gsdf.md](column/gsdf.md) | — | 1985-2026 | D33 |  |
 | F42 | 地方防衛局・防衛支局の測量 520 件に直営は 0 件 (専門部隊は直営、出先機関は外注) | [column/gsdf.md](column/gsdf.md) | — | 1985-2026 | D33 |  |
-| F47 | 令和7年度の公共事業執行 128 件・防災減災 134 件 (分類規則に地すべりを足した後) | [r07/tables.md](r07/tables.md) | — | 2025 | D17 |  |
+| F47 | 令和7年度の公共事業執行 128 件・防災減災 134 件 (分類規則に地すべりを足した後) | [archive/r07/tables.md](archive/r07/tables.md) | — | 2025 | D17 |  |
 | F48 | 概況の「平年」(前 5 年度) は平成21〜25年度について平成20年度以前を含み、予想外が出やすい | [anomaly/summary.md](anomaly/summary.md) | — | 2009-2013 | D24 |  |
 | F49 | 平成30年度は胆振東部地震の復旧で冬 (1〜3 月) の受付が 23 件 (前年度 6 件、うち胆振 16) に増え、北海道の「冬の空白」が崩れた | [yearly/h30/summary.md](yearly/h30/summary.md) | — | 2018 | D32 |  |
 | F50 | 平成30年度に道の農業農村の届出が 118 → 156 件に増えた (オホーツク 4 → 19 件など)。原因は未確定 | [yearly/h30/summary.md](yearly/h30/summary.md) | — | 2018 | D32 |  |
@@ -87,12 +87,12 @@
 
 | id | 主張 | 根拠 | 外部資料 | 年度 | 記録 | 置き換えた発見 |
 |---|---|---|---|---|---|---|
-| F03 | 令和6年度の道の農業農村の倍増は事業の着手の増加 | [r07/draft.md](r07/draft.md) | — | 2024 | D16 | F02 |
+| F03 | 令和6年度の道の農業農村の倍増は事業の着手の増加 | [archive/r07/draft.md](archive/r07/draft.md) | — | 2024 | D16 | F02 |
 | F09 | 冬 (1〜3 月) の受付の空白は北海道に固有 | [national/summary.md](national/summary.md) | — | 2023-2025 | D21 | F10 |
 | F14 | 分野「行政情報」の多さは北海道の特徴 | [national/summary.md](national/summary.md) | — | 2023-2025 | D21 |  |
-| F43 | 試行版の「空知は中山間」は誤り | [r07/draft.md](r07/draft.md) | — | 2025 | D16 |  |
+| F43 | 試行版の「空知は中山間」は誤り | [archive/r07/draft.md](archive/r07/draft.md) | — | 2025 | D16 |  |
 | F44 | 試行版の「自治体の航空写真の多くは固定資産税」は北海道には当てはまらない | [national/summary.md](national/summary.md) | — | 2023-2025 | D21 |  |
-| F45 | 歌志内市は令和元〜7年度も 0 件 | [stepping/summary.md](stepping/summary.md) | — | 2019-2025 | D18 |  |
+| F45 | 歌志内市は令和元〜7年度も 0 件 | [archive/stepping/summary.md](archive/stepping/summary.md) | — | 2019-2025 | D18 |  |
 | F61 | 平成25年度の市町村の多さは基準点の測量によるもので、東日本大震災後の成果改定の可能性がある (出来事: 災害) | [annual/summary.md](annual/summary.md) | — | 2013 | D18 | F60 |
 | F63 | 平成24年度の十勝と集中の予想外は、業務名の記述が始まった記録の形の変化 | [annual/summary.md](annual/summary.md) | — | 2012 | D18 | F62 |
 
@@ -102,7 +102,7 @@
 |---|---|---|---|---|---|---|
 | F05 | 令和4年度の上川の減少は原因未確定 (道の予算か届出か) | [anomaly/summary.md](anomaly/summary.md) | — | 2022 | D24 | F04 |
 | F07 | 件数は予算の転換点は写すが、年ごとの増減は予算と合わない | [budget/summary.md](budget/summary.md) | — | 2009-2025 | D19 | F06 |
-| F21 | 地域の重心は十勝・空知へ移った | [stepping/summary.md](stepping/summary.md) | — | 2010-2025 | D18 | F20 |
-| F46 | 令和7年度の公共事業執行 131 件・防災減災 131 件 | [r07/draft.md](r07/draft.md) | — | 2025 | D17 | F47 |
+| F21 | 地域の重心は十勝・空知へ移った | [archive/stepping/summary.md](archive/stepping/summary.md) | — | 2010-2025 | D18 | F20 |
+| F46 | 令和7年度の公共事業執行 131 件・防災減災 131 件 | [archive/r07/draft.md](archive/r07/draft.md) | — | 2025 | D17 | F47 |
 | F51 | 航空系の工期は開始の季節をそろえても地上より 30〜45 日長い | [term/summary.md](term/summary.md) | — | 2009-2025 | D22 | F52 |
 | F68 | 平成21年度の件数と上期の予想外は経済対策と前倒し執行 (1 年の出来事: 予算) | [annual/summary.md](annual/summary.md) | — | 2009 | D18 | F67 |

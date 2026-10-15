@@ -1,6 +1,6 @@
 # 令和7年度 (2025) 北海道測量概況
 
-根拠表は [tables.md](tables.md) (`scripts/yearly_tables.py 2025`)。型は [../README.md](../README.md)。旧版の素案は [../../r07/draft.md](../../r07/draft.md)。
+根拠表は [tables.md](tables.md) (`scripts/yearly_tables.py 2025`)。型は [../README.md](../README.md)。旧版の素案は [../../archive/r07/draft.md](../../archive/r07/draft.md)。
 令和7年度は年度途中のデータではない (令和8年 3 月までの受付を含む、2026-09-24 取得)。
 
 ## 概況 (2 層)

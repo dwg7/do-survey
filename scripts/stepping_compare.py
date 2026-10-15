@@ -2,8 +2,8 @@
 """飛び石 (平成22・27年度、令和2・7年度) の主な指標を 1 枚に並べる (D18)。
 
 入力: analysis/classified.csv
-出力: reports/stepping/compare.md
-各年度の詳しい表は reports/{h22,h27,r02,r07}/tables.md (scripts/year_tables.py)。
+出力: reports/archive/stepping/compare.md
+各年度の詳しい表は reports/archive/{h22,h27,r02,r07}/tables.md (scripts/year_tables.py)。
 単年はぶれるので、件数の構成比には前後を含む 3 年度平均も併記する。
 """
 import collections
@@ -176,6 +176,6 @@ body9 = [['開発局'] + cnt9(lambda r: r['planner_type'] == '北海道開発局
          ['道のうち道路'] + cnt9(lambda r: r['planner_type'] == '北海道' and r['field'] == '道路')]
 table('C9 開発局と道の件数の推移 (平成18〜27年度)', heads9, body9)
 
-(ROOT / 'reports/stepping').mkdir(parents=True, exist_ok=True)
-(ROOT / 'reports/stepping/compare.md').write_text('\n'.join(out) + '\n')
-print('wrote reports/stepping/compare.md')
+(ROOT / 'reports/archive/stepping').mkdir(parents=True, exist_ok=True)
+(ROOT / 'reports/archive/stepping/compare.md').write_text('\n'.join(out) + '\n')
+print('wrote reports/archive/stepping/compare.md')

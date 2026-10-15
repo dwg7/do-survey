@@ -21,7 +21,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCRIPT = 'scripts/r07_tables.py' if (len(sys.argv) <= 1 or sys.argv[1] == '2025') else 'scripts/year_tables.py'
 Y = int(sys.argv[1]) if len(sys.argv) > 1 else 2025
-OUT = sys.argv[2] if len(sys.argv) > 2 else 'reports/r07/tables.md'
+OUT = sys.argv[2] if len(sys.argv) > 2 else 'reports/archive/r07/tables.md'
 YEARS = list(range(Y - 6, Y + 1))
 AIMS = ['生産力維持', '地域維持', '公共事業執行', '防災減災', '資産管理', '制度・権利管理']
 PTYPES = ['北海道', '北海道開発局', '市町村', '法務局', '防衛省', '国 (その他)', 'その他']

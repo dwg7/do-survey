@@ -81,7 +81,8 @@ def check(d):
 def main():
     dirs = [pathlib.Path(a) for a in sys.argv[1:]] or (
         sorted(p for p in (ROOT / 'reports/yearly').iterdir() if p.is_dir())
-        + sorted(p.parent for p in (ROOT / 'reports').glob('*/summary.md')))
+        + sorted(p.parent for p in (ROOT / 'reports').glob('*/summary.md'))
+        + sorted(p.parent for p in (ROOT / 'reports/archive').glob('*/summary.md')))   # アーカイブも検査は続ける
     total = 0
     for d in dirs:
         bad = check(d if d.is_absolute() else ROOT / d)

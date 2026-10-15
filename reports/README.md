@@ -1,11 +1,25 @@
 # 北海道測量概況 — レポートの案内
 
 国土地理院「公共測量実施情報」(北海道地方測量部、区分 A) を観測窓にして、「北海道で何が行われているか」を読む試みの
-レポート群。2026-10-07〜13 に作成。すべて素案で、レビューを前提とする。2026-10-13 に全体を検証し直した (D35、下の「検証の記録」)。
+レポート群。2026-10-07〜16 に作成。すべて素案で、レビューを前提とする。2026-10-13 に全体を検証し直した (D35、下の「検証の記録」)。
 
 - 数字は各レポートの根拠表 (スクリプトの生成物) から引いている。本文の数は `scripts/check_numbers.py` で根拠表と照らし、主な主張は `scripts/verify_findings.py` で元データから計算し直している (D34・D35)。判断の経緯は [../DECISIONS.md](../DECISIONS.md) の D 番号を参照。
 - 結論を一覧で読むなら、[発見の台帳 (findings.md)](findings.md) が早い。
-- 出典: 国土地理院ウェブサイト「公共測量実施情報」(https://psgsv4.gsi.go.jp/giaSearch/)、北海道開発局「予算概要」、北海道「予算の概要」・北海道入札監視委員会の資料・北海道「住民基本台帳人口・世帯数」を dwg7 が編集・加工して作成。
+- 出典: 国土地理院ウェブサイト「公共測量実施情報」(https://psgsv4.gsi.go.jp/giaSearch/)、北海道開発局「予算概要」、北海道「予算の概要」・北海道入札監視委員会の資料・北海道「住民基本台帳人口・世帯数」・都市計画基礎調査の業務処理要領を dwg7 が編集・加工して作成。
+
+## 構成と読む順
+
+| 層 | 置き場所 | 中身 | 読む順 |
+|---|---|---|---|
+| 全体の要約 | [overview/](overview/summary.md) | 長期概況 (平成21〜令和7年度): 17 年の地勢の変化と、49 の予想外を仕分けた出来事の表 (D39) | 1 |
+| 発見の一覧 | [findings.md](findings.md) (`findings.csv` から生成) | 主な発見 1 行ずつ、状態 (確認・集計・推定・否定・置き換え) と根拠つき | 2 |
+| 年度ごと | [yearly/](yearly/README.md) | 令和7〜平成21年度の 17 年度の概況 (地勢と今年の天気の 2 層、Y1〜Y7 の根拠表) | 3 (関心のある年度) |
+| テーマ別 | 下の「レポート一覧」1〜16 | レンズの検証 (件数と事業費・契約・補正予算)、地勢の比較 (他の地方・都道府県・季節・工期)、地域、千人村、都市計画 | 4 (テーマ別の索引から) |
+| コラム・方法 | [column/](column/gsdf.md)、[meta/](meta/harness.md) | 地理情報隊の公共測量 (全国)、ハーネスの振り返り | 随時 |
+| 補助 | [longterm/](longterm/estimate.md) | 遡って比べられる範囲の見積もり (D17、長期の比較の土台) | 必要な時 |
+| アーカイブ | [archive/](archive/) | 年度ごとの概況と長期概況に置き換わったもの: 令和7年度の旧素案 ([r07](archive/r07/draft.md)、新しい版は yearly/r07)、飛び石 ([stepping](archive/stepping/summary.md) とその各年度の根拠表 h22・h27・r02)。本文は書いた時のまま残し、数字の検査は続ける (D40) | 経緯を追う時 |
+
+各フォルダは、本文 (`summary.md` など)、根拠表 (`tables.md`・`compare.md`、スクリプトの生成物)、本文の数の補い (`checks.csv`) を持つ。
 
 ## まず押さえる「レンズの癖」
 
@@ -13,21 +27,21 @@
 
 1. **件数は事業の規模ではない。** 測量の需要 (土地に手を入れる回数) を表す。金額では道路が最大でも、件数では農業が最大 ([budget](budget/summary.md))。
 2. **届出の範囲が広がり続けている。** 平成20年代初めまでは登録する機関そのものが増え ([longterm](longterm/estimate.md))、その後も 100 億円あたりの
-   件数 (密度) が上がり続けた。令和6年度の道営農業の倍増は、会計検査院の指摘を受けた届出の増加で、道の委託契約は増えていない ([r07](r07/draft.md) §5、[budget](budget/summary.md)、[contracts](contracts/summary.md))。
+   件数 (密度) が上がり続けた。令和6年度の道営農業の倍増は、会計検査院の指摘を受けた届出の増加で、道の委託契約は増えていない ([r07](archive/r07/draft.md) §5、[budget](budget/summary.md)、[contracts](contracts/summary.md))。
    **道の届出は事業の量より届出の運用に左右される** (契約に対する比率が年で揺れる、[contracts](contracts/summary.md))。
 3. **記録の形が年代で変わる。** 業務名 (自由記述) は平成24年度ごろから、担当部署と実施地域図は平成21年度ごろから。令和7年 4〜8 月は業務名が欠ける。
    計画機関名は現在の組織名に置き換えて記録されている。
 4. **受付は契約の時点、工期は契約の窓。** 作業の時期や作業時間ではない ([term](term/summary.md))。
 5. **毎年同じことは、年の比較では情報がないが、地方の比較では北海道の特徴になりうる。比べる単位は都道府県まで細かくする** (地方単位では冬の空白を固有と見誤った、[national2](national2/summary.md)) ([annual](annual/summary.md)、[national](national/summary.md))。
 
-## レポート一覧 (推奨の読む順)
+## レポート一覧 (テーマ別、書いた順)
 
 | # | レポート | 問い | 結論 (一行) | 根拠表 | 記録 |
 |---|---|---|---|---|---|
-| 1 | [令和7年度 北海道測量概況 (改訂版) 素案](r07/draft.md) | 試行版の概況文は正しいか。仮説 A〜C は | 試行版の多くは支持、「空知は中山間」「自治体の航空写真は固定資産税」は否定。仮説 A は件数では支持・規模では否定、B は「土地に手を入れる行政」のセンサーとして支持、C は日高は接続・胆振は復旧と生産 | [tables](r07/tables.md) | D16 |
+| 1 | (アーカイブ) [令和7年度 北海道測量概況 (改訂版) 素案](archive/r07/draft.md) | 試行版の概況文は正しいか。仮説 A〜C は | 試行版の多くは支持、「空知は中山間」「自治体の航空写真は固定資産税」は否定。仮説 A は件数では支持・規模では否定、B は「土地に手を入れる行政」のセンサーとして支持、C は日高は接続・胆振は復旧と生産 | [tables](archive/r07/tables.md) | D16 |
 | 2 | [件数と事業費の突き合わせ](budget/summary.md) | 件数は事業費の動きを写すか | 予算の大きな転換点は増幅されて写るが、年ごとの増減は合わない (11 で一部修正: 前年度の補正を足すと合う)。密度が上がり続け、令和6年度の倍増は予算では説明できない | [compare](budget/compare.md) | D19 |
 | 3 | [長期の変化は取れるか — 見積もり](longterm/estimate.md) | どの年代まで遡って比べられるか | 比べる土台は平成21年度以降。それ以前は幅付き・参考 | [tables](longterm/tables.md) | D17 |
-| 4 | [飛び石で見た北海道の 15 年](stepping/summary.md) | 平成22・27年度、令和2・7年度で何が変わったか | 測量の構成は道路から農業へ (事業費の重心は動いていない)、上期集中の進行、十勝・空知への重心移動 (12 で修正: 伸び続けているのは十勝だけ)、日高の接続の持続 | [compare](stepping/compare.md)、[H22](h22/tables.md)・[H27](h27/tables.md)・[R2](r02/tables.md) | D18 |
+| 4 | (アーカイブ) [飛び石で見た北海道の 15 年](archive/stepping/summary.md) | 平成22・27年度、令和2・7年度で何が変わったか | 測量の構成は道路から農業へ (事業費の重心は動いていない)、上期集中の進行、十勝・空知への重心移動 (12 で修正: 伸び続けているのは十勝だけ)、日高の接続の持続 | [compare](archive/stepping/compare.md)、[H22](archive/h22/tables.md)・[H27](archive/h27/tables.md)・[R2](archive/r02/tables.md) | D18 |
 | 5 | [単年度の概況は「薄曇り」か「太陽は東から昇る」か](annual/summary.md) | 単年度の概況はどれだけ情報を持つか | 「最も多いのは〜」は自明か偶然のぶれ。「平年と比べて」は 17 年中 15 年に予想外があり、出来事 (予算・災害・施策) と、レンズの変化・物差しが混ざる (16 の長期概況で仕分け直すと出来事は 3 分の 1)。概況を「地勢」と「今年の天気」の 2 層で書く提案 | [overviews](annual/overviews.md)、[skill](annual/skill.md) | D20 |
 | 6 | [北海道の「地勢」は北海道に固有か](national/summary.md) | 毎年同じ特徴は北海道に固有か | 7 月の山・冬の空白は北海道に固有 (冬の空白は 13 で修正)。農業が最大は農村型の地方に共通。市町村・民間の発注と固定資産の航空写真は 10 地方で最少 | [compare](national/compare.md) | D21 |
 | 7 | [受付の季節の形の分解](season/summary.md) | 夏の集中の強まりは全国一律か | 元からの地勢に、全国共通の前倒し (約半分) と北海道に固有の上乗せ (夏の山の鋭化、開発局の早期発注) が重なった | [compare](season/compare.md) | D23 |
@@ -48,7 +62,7 @@
 | このデータで何が見えるか (レンズ) | 3 長期の土台、2 件数と事業費、10 道の契約、11 補正予算、5 単年度の概況の情報量 |
 | 北海道の地勢 (毎年同じ形) | 6 地方の比較、13 都道府県の比較、7 季節の形の分解、8 工期 |
 | 地域と市町村 | 12 振興局と測量のない市町村、14 千人村、15 都市計画 |
-| 年度ごとの出来事 | 16 長期概況 (出来事の表)、[年度ごとの概況](yearly/README.md) (令和7〜平成21年度)、9 予想外の掘り下げ、4 飛び石、1 令和7年度の旧素案 (新しい版は yearly/r07) |
+| 年度ごとの出来事 | 16 長期概況 (出来事の表)、[年度ごとの概況](yearly/README.md) (令和7〜平成21年度)、9 予想外の掘り下げ (アーカイブ: 4 飛び石、1 令和7年度の旧素案) |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -150,11 +164,13 @@ for s in B C D E F G H I J; do python3 scripts/fetch.py --section $s --years 200
 # 都市計画基礎調査の業務処理要領、計画機関の語で引いた結果 (data/raw/gsdf/)。取り方は HANDOVER.md と各 D 番号。
 
 # レポートの根拠表 (番号は上の一覧)
-python3 scripts/r07_tables.py             # 1 reports/r07/tables.md
+python3 scripts/r07_tables.py             # 1 reports/archive/r07/tables.md
 python3 scripts/budget_compare.py         # 2 reports/budget/compare.md
 python3 scripts/longterm_tables.py        # 3 reports/longterm/tables.md
-python3 scripts/stepping_compare.py       # 4 reports/stepping/compare.md
-for a in "2010 reports/h22" "2015 reports/h27" "2020 reports/r02"; do set -- $a; python3 scripts/year_tables.py $1 $2/tables.md; done   # 4 の各年度
+python3 scripts/stepping_compare.py       # 4 reports/archive/stepping/compare.md
+python3 scripts/year_tables.py 2010 reports/archive/h22/tables.md   # 4 の各年度 (アーカイブ)
+python3 scripts/year_tables.py 2015 reports/archive/h27/tables.md
+python3 scripts/year_tables.py 2020 reports/archive/r02/tables.md
 python3 scripts/annual_overview.py        # 5 reports/annual/overviews.md・skill.md
 python3 scripts/national_compare.py       # 6 reports/national/compare.md
 python3 scripts/season_did.py             # 7 reports/season/compare.md

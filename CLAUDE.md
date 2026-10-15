@@ -77,8 +77,10 @@
 - 各レポートの数は、そのフォルダの根拠表 (`tables.md`・`compare.md` など、`scripts/` の生成物) から引く。本文に数の表を置く時も根拠表の値を写し、
   推移の表のような根拠表の写しでない表は、根拠表の生成に移す (stepping の C9、D35)。
 - 年度ごとの概況 (`reports/yearly/<r07・h30 など>/`) の根拠表は `scripts/yearly_tables.py <受付年度>`。型は `reports/yearly/README.md` (D32)。
-- 令和7年度の旧素案 `reports/r07/draft.md` の根拠表は `scripts/r07_tables.py` (中身は `scripts/year_tables.py`、受付年度を引数に取る)。
+- 令和7年度の旧素案 `reports/archive/r07/draft.md` の根拠表は `scripts/r07_tables.py` (中身は `scripts/year_tables.py`、受付年度を引数に取る)。
   `year_tables.py` を変えたら `r07_tables.py` の出力が変わらないかを確かめ、変わるなら素案の数字も同じコミットで直す。
+
+- 置き換わったレポートは `reports/archive/` に移す (本文は書いた時のまま、冒頭に置き換え先、検査は続ける、D40)。
 
 ### 書き方
 

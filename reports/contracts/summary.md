@@ -8,7 +8,7 @@
 ## 問い
 
 公共測量の届出の件数が動いた時、それは道の事業 (発注) が動いたのか、届出の仕方 (レンズ) が動いたのか。
-これまで ([r07](../r07/draft.md) §5、[budget](../budget/summary.md)、[anomaly](../anomaly/summary.md)) は予算や業務名からの推定だった。
+これまで ([r07](../archive/r07/draft.md) §5、[budget](../budget/summary.md)、[anomaly](../anomaly/summary.md)) は予算や業務名からの推定だった。
 ここでは同じ機関・同じ期間 (4〜9 月) の**委託契約の件数**を物差しにする。
 
 ## 物差しの性格 (先に書く限界)
