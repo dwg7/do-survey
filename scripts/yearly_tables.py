@@ -78,6 +78,27 @@ for g, keys, k in GROUPS:
 out.append(f'\nしきい値 (k = 1 / 3 / 6 / 14): ' + '、'.join(f'k={k} {t1}・{t2}' for k, (t1, t2) in THR.items()) + '。'
            f'予想外 = 平年からも傾向からも外れる。予想外の指標: ' + ('、'.join(s[0] for s in surprises) or 'なし') + '。\n')
 
+# 平年 (前 5 年度) に平成20年度以前 (届出の範囲が狭く、分野の「不明」が多い時期) が入る年度は、後の 5 年度とも比べて物差しを確かめる (D38)。
+if Y - 5 <= 2008:
+    sampling_sd = ns['sampling_sd']
+    out.append(f'**物差しの確かめ: 後の 5 年度 ({short(Y + 1)}〜{short(Y + 5)}) との比較** (平年に平成20年度以前が入る年度だけ。'
+               '前の平年と後の 5 年度の両方から同じ向きに外れれば出来事の候補、前とだけ外れれば物差しの問題の候補)\n')
+    out.append('| 指標 | 今年 | 前の平年 | z (前) | 後の 5 年度 | z (後) |')
+    out.append('|---|---:|---:|---:|---:|---:|')
+    unk = statistics.mean(sum(1 for r in by_year[x] if r['field'] == '不明') / len(by_year[x]) for x in range(Y - 5, Y)) if all(x in by_year for x in range(Y - 5, Y)) else None
+    for g, keys, k in GROUPS:
+        for key in keys:
+            vals = [IND[x][key] for x in range(Y + 1, Y + 6)]
+            ma = statistics.mean(vals)
+            za = (IND[Y][key] - ma) / max(statistics.stdev(vals), sampling_sd(Y, key, ma))
+            mb, _ = normal(Y, key)
+            if abs(z(Y, key)) < THR[k][0] and abs(za) < THR[k][0]:
+                continue
+            f = (lambda x: f'{x:.0f}') if key in ('件数', '測量のあった市町村') else pct
+            out.append(f'| {key} | {f(IND[Y][key])} | {f(mb)} | {z(Y, key):+.1f} | {f(ma)} | {za:+.1f} |')
+    out.append('\n前か後のどちらかで群のしきい値の低い方を超えた指標だけを並べる。前の平年の 5 年度で分野が「不明」の割合の平均: '
+               + (pct(unk) if unk is not None else '—') + '。\n')
+
 # ---- Y2 予算と契約 ----
 out.append('## Y2. 予算と契約\n')
 ini = {int(r['year']): int(r['total']) / 100 for r in csv.DictReader((ROOT / 'data/external/hkd-budget-initial.csv').open()) if r['kind'] == 'direct'}
@@ -215,8 +236,12 @@ out.append(f'| 分野が「不明」の割合 | {pct(fc["不明"] / N)} | {pct(s
 out.append(f'| 業務名が 7 字未満の件数 | {N - free} | {sum(1 for r in pr if len(r["purpose"]) <= 6)} |')
 shr = [r for r in rows if len(r['purpose']) <= 6]
 if shr:
-    out.append('\n7 字未満の業務名 (今年): 多い語 ' + '、'.join(f'「{k or "(空)"}」{v}' for k, v in sorted(collections.Counter(r['purpose'].strip() for r in shr).items(), key=lambda kv: (-kv[1], kv[0]))[:5])
+    nw = 10 if len(shr) > N / 2 else 5   # 業務名が決まり文句の年度は、語の選び方を前年度と比べられるように多めに出す
+    out.append('\n7 字未満の業務名 (今年): 多い語 ' + '、'.join(f'「{k or "(空)"}」{v}' for k, v in sorted(collections.Counter(r['purpose'].strip() for r in shr).items(), key=lambda kv: (-kv[1], kv[0]))[:nw])
                + '。発注主体 ' + '、'.join(f'{k} {v}' for k, v in sorted(collections.Counter(r['planner_type'] for r in shr).items(), key=lambda kv: (-kv[1], kv[0]))))
+    if nw == 10:
+        psh = collections.Counter(r['purpose'].strip() for r in pr if len(r['purpose']) <= 6)
+        out.append('\n7 字未満の業務名 (前年度): 多い語 ' + '、'.join(f'「{k or "(空)"}」{v}' for k, v in sorted(psh.items(), key=lambda kv: (-kv[1], kv[0]))[:10]))
 notes = []
 if Y >= 2024:
     notes.append('令和6年度以降は道の農業農村整備の届出が段差で増えた後 (届出の比率 15% → 33%、D25)。令和5年度以前と農業の件数を比べる時は段差を差し引く。')
@@ -314,6 +339,8 @@ for b in sb:
     keys = sorted(set(c0) | set(c1), key=lambda k: (-abs(c1[k] - c0[k]), k))[:6]   # 同点は名前の順 (集合の並びは実行ごとに変わる)
     out.append(f'\n**平年から外れた振興局の内訳: {b}** (前年度 → 今年、差の大きい順): '
                + '、'.join(f'{t}・{f} {c0[(t, f)]} → {c1[(t, f)]}' for t, f in keys))
+    dsh = lambda yy: pct(sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and b in r['bl']) / max(1, sum(1 for r in by_year[yy] if r['planner_type'] == '北海道')))
+    out.append(f'  - 道の測量のうち {b} に関わる割合 (分母の効果を除いた見方): ' + '、'.join(f'{short(yy)} {dsh(yy)}' for yy in range(max(2009, Y - 2), min(2025, Y + 5) + 1)))
     big = max(keys, key=lambda k: c1[k] - c0[k])
     if c1[big] - c0[big] <= 0:
         continue
@@ -361,6 +388,7 @@ out.append('- 道の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy]
 out.append('- 位置基盤: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['field'] == '位置基盤')))
 out.append('- 冬 (1〜3 月) の受付: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['recept_date'][5:7] in ('01', '02', '03'))))
 out.append('- 航空レーザ: ' + series(lambda yy: sum(1 for r in by_year[yy] if '航空レーザ' in r['kinds'])))
+out.append('- 上期 (4〜9 月) の割合 (平成16年度から): ' + '、'.join(f'{short(yy)} {mshare(yy, (4, 5, 6, 7, 8, 9))}' for yy in range(2004, 2026)))
 out.append('- 道の農業農村: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '農業農村')))
 out.append('- 道の防災・治水: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '防災・治水')))
 out.append('- 道の道路: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '道路')))

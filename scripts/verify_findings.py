@@ -180,6 +180,21 @@ up = lambda y, t: p(sum(1 for r in yr(y) if r['planner_type'] == t and r['m'] in
 check('F58', '上期の割合 H25 → H26 (道・市町村・開発局、%)', tuple((up(2013, t), up(2014, t)) for t in ('北海道', '市町村', '北海道開発局')), ((71, 77), (71, 81), (61, 61)))
 check('F59', '7 字未満の業務名 H25 → H26 と「道路計画」', (sum(1 for r in yr(2013) if len(r['purpose']) <= 6), sum(1 for r in yr(2014) if len(r['purpose']) <= 6),
                                                 sum(1 for r in yr(2014) if r['purpose'].strip() == '道路計画')), (32, 73, 35))
+# F60〜F67: 平成25〜21年度の概況 (D38)
+m25 = [r for r in yr(2013) if r['planner_type'] == '市町村' and r['field'] == '位置基盤']
+msh = lambda y: sum(1 for r in yr(y) if r['planner_type'] == '市町村') / len(yr(y))
+check('F60', '平成25年度の市町村の位置基盤・うち成果の改正・市町村の割合・後の 5 年度の平均 (%)',
+      (len(m25), sum(1 for r in m25 if '成果' in r['purpose']), round(100 * msh(2013)), round(100 * statistics.mean(msh(y) for y in range(2014, 2019)))), (18, 1, 14, 15))
+bsh = lambda b, y, t=None: p(sum(1 for r in yr(y) if b in r['bur'] and (t is None or r['planner_type'] == t)), sum(1 for r in yr(y) if r['mun'] and (t is None or r['planner_type'] == t)))
+check('F62', '十勝の割合 H24・H25 (%)', (bsh('十勝', 2012), bsh('十勝', 2013)), (13, 10))
+w = lambda y, t: sum(1 for r in yr(y) if r['purpose'].strip() == t)
+check('F64', '河川管理・道路管理 H22 → H23、道路の 3 語の合計', ((w(2010, '河川管理'), w(2011, '河川管理')), (w(2010, '道路管理'), w(2011, '道路管理')),
+      tuple(sum(w(y, t) for t in ('道路計画', '道路用地', '道路管理')) for y in (2010, 2011))), ((20, 44), (11, 43), (171, 203)))
+check('F65', '道の測量の中での空知の割合 H23 (%)', bsh('空知', 2011, '北海道'), 23)
+kd = lambda y: sum(1 for r in yr(y) if r['planner_type'] == '北海道開発局')
+check('F66', '開発局の届出 H21 → H22 と減り方 (%)', (kd(2009), kd(2010), round(100 * (kd(2009) - kd(2010)) / kd(2009))), (229, 71, 69))
+hs = lambda y: p(sum(1 for r in yr(y) if r['m'] in (4, 5, 6, 7, 8, 9)), sum(1 for r in yr(y) if r['m']))
+check('F67', '上期の割合 H16〜H20 の最小・最大と H21 (%)', (min(hs(y) for y in range(2004, 2009)), max(hs(y) for y in range(2004, 2009)), hs(2009)), (61, 63, 69))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 

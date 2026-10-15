@@ -47,7 +47,7 @@
 | このデータで何が見えるか (レンズ) | 3 長期の土台、2 件数と事業費、10 道の契約、11 補正予算、5 単年度の概況の情報量 |
 | 北海道の地勢 (毎年同じ形) | 6 地方の比較、13 都道府県の比較、7 季節の形の分解、8 工期 |
 | 地域と市町村 | 12 振興局と測量のない市町村、14 千人村、15 都市計画 |
-| 年度ごとの出来事 | [年度ごとの概況](yearly/README.md) (令和7〜平成26年度)、9 予想外の掘り下げ、4 飛び石、1 令和7年度の旧素案 (新しい版は yearly/r07) |
+| 年度ごとの出来事 | [年度ごとの概況](yearly/README.md) (令和7〜平成21年度)、9 予想外の掘り下げ、4 飛び石、1 令和7年度の旧素案 (新しい版は yearly/r07) |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -95,6 +95,9 @@
 | season: 構成の効果 +2、分野の中の前倒し +13 | 分解の順序で変わり、構成の効果 0〜+4、分野の中の前倒し +12〜+16。結論 (構成の効果は小さい) は同じ | season (D35) |
 | stepping: 開発局の件数の表 (平成24年度 157 件など) | 計画機関の分類を直した後は 163 件。表は compare.md の C9 から生成するようにした | stepping (D35) |
 | 地方の比較: 「冬の空白は北海道に固有」(2 月 z = −6.7) | 都道府県で比べると秋田・山形・青森など雪国に共通で、北海道はその端。固有なのは 7 月への集中で、それも令和5年度以降に際立った | national・annual (D28) |
+| 平成21年度の件数と上期の割合の予想外は「経済対策と前倒し執行」(出来事: 予算) | 前の平年 (平成16〜20年度) からは外れるが、後の 5 年度とは同じ水準 (z +0.8・+0.3)。上期の割合は平成20年度 61% から段が上がって続いた。経済対策が重なった可能性は残るが、1 年の出来事とは言えない | annual (D38)、yearly/h21 |
+| 平成24年度の十勝の割合と上位 10 市町村の割合 (集中の低さ) は「業務名の記述が始まった記録の形の変化」 | 地域と市町村は業務名ではなく市町村の欄から決まり、1 件あたりの市町村の数も変わっていない。十勝は道の農業 (畑地帯)・河川・開拓財産が重なった一年の山 (原因は未確定) | annual (D38)、yearly/h24 |
+| 平成25年度の市町村の発注の多さは「基準点 18 件、東日本大震災後の成果改定の可能性」(出来事: 災害) | 基準点の測量は街区基準点の移設・復旧・再設の日常の維持管理で、標高成果の改正は 1 件だけ (災害の根拠はない)。市町村の割合は後の 5 年度と同じ水準で、**後も続く段の始まり** (原因は未確定) | annual (D38)、yearly/h25 |
 
 ## 検証の記録 (2026-10-13、D35)
 
@@ -162,7 +165,7 @@ python3 scripts/national_deep.py          # 13 reports/national2/tables.md
 python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md
 python3 scripts/city_planning.py          # 15 reports/cityplan/tables.md
 python3 scripts/column_gsdf.py            # コラム reports/column/gsdf-tables.md
-for y in $(seq 2014 2025); do python3 scripts/yearly_tables.py $y; done   # 年度ごとの概況 reports/yearly/<年度>/tables.md
+for y in $(seq 2009 2025); do python3 scripts/yearly_tables.py $y; done   # 年度ごとの概況 reports/yearly/<年度>/tables.md
 
 # 検査 (CLAUDE.md の「検査」)
 python3 scripts/check_numbers.py          # 本文の数が根拠表と checks.csv で裏付けられるか
