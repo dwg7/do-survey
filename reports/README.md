@@ -47,7 +47,7 @@
 | このデータで何が見えるか (レンズ) | 3 長期の土台、2 件数と事業費、10 道の契約、11 補正予算、5 単年度の概況の情報量 |
 | 北海道の地勢 (毎年同じ形) | 6 地方の比較、13 都道府県の比較、7 季節の形の分解、8 工期 |
 | 地域と市町村 | 12 振興局と測量のない市町村、14 千人村、15 都市計画 |
-| 年度ごとの出来事 | [年度ごとの概況](yearly/README.md) (令和7〜平成30年度)、9 予想外の掘り下げ、4 飛び石、1 令和7年度の旧素案 (新しい版は yearly/r07) |
+| 年度ごとの出来事 | [年度ごとの概況](yearly/README.md) (令和7〜平成26年度)、9 予想外の掘り下げ、4 飛び石、1 令和7年度の旧素案 (新しい版は yearly/r07) |
 
 データの定義と市町村名の読み替えは [../SCHEMA.md](../SCHEMA.md)、分類の規則は [../analysis/](../analysis/) の `*-rules.csv`。
 
@@ -162,7 +162,7 @@ python3 scripts/national_deep.py          # 13 reports/national2/tables.md
 python3 scripts/small_villages.py         # 14 reports/smallvillage/tables.md
 python3 scripts/city_planning.py          # 15 reports/cityplan/tables.md
 python3 scripts/column_gsdf.py            # コラム reports/column/gsdf-tables.md
-for y in $(seq 2017 2025); do python3 scripts/yearly_tables.py $y; done   # 年度ごとの概況 reports/yearly/<年度>/tables.md
+for y in $(seq 2014 2025); do python3 scripts/yearly_tables.py $y; done   # 年度ごとの概況 reports/yearly/<年度>/tables.md
 
 # 検査 (CLAUDE.md の「検査」)
 python3 scripts/check_numbers.py          # 本文の数が根拠表と checks.csv で裏付けられるか

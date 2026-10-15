@@ -1,14 +1,14 @@
-# HANDOVER.md — 引き継ぎ (2026-10-14 時点)
+# HANDOVER.md — 引き継ぎ (2026-10-16 時点)
 
-規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D36)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
+規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D37)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
 このファイルは「今どこまで進んでいて、次に何をするか」と、ファイルに書いていない作業の型だけを書く (都度まるごと書き直す)。
 
 ## 今の段階
 
-**年度ごとの北海道測量概況を、新しい年度から 1 年度ずつ書いている** (D32、`reports/yearly/`)。hfu の了承した順で、令和7年度から平成29年度まで
-書き終えた。**次は平成28年度**、その後 平成27年度 … 平成21年度。1 年度ごとに:
+**年度ごとの北海道測量概況を、新しい年度から 1 年度ずつ書いている** (D32、`reports/yearly/`)。hfu の了承した順で、令和7年度から平成26年度まで
+書き終えた。**次は平成25年度**、その後 平成24年度 … 平成21年度。1 年度ごとに:
 
-1. `python3 scripts/yearly_tables.py <受付年度>` で根拠表を作る (`reports/yearly/h28/tables.md` など)。
+1. `python3 scripts/yearly_tables.py <受付年度>` で根拠表を作る (`reports/yearly/h25/tables.md` など)。
 2. 予想外 (Y1) を中身で読み、Y7 の内訳と、必要なら元データへの問い合わせで原因を探す。問い合わせた数は、本文に使う前に `yearly_tables.py` の Y7 に足す。
 3. `summary.md` を型 (`reports/yearly/README.md`) どおりに書く。足し算などは `checks.csv`。
 4. `check_numbers.py`・`check_findings.py`・`verify_findings.py` を通し、本文の主張を根拠表と手で照合する。新しい発見は台帳と `verify_findings.py` に足す。
@@ -20,9 +20,9 @@
 
 - データ: `data/surveys.parquet` (受付年度 1983〜2026 の 17,514 件、2026-09-24 取得、2026 年度は 9/17 受付分まで)。
 - ダッシュボード: https://dwg7.unopengis.org/do-survey/ (GitHub Pages、main の /docs)。D10〜D15。
-- 分析: `reports/` のレポート 15 本 (D16〜D31)、年度ごとの概況 9 年度 (D32)、コラム 1 本 (D33)、方法の振り返り (D34)、発見の台帳 55 件。
-  2026-10-13 に全体を検証し直した (D35、`reports/README.md` の「検証の記録」)。2026-10-14 にドキュメントを整合させた (D36)。
-- 検査: 本文の数字 (`check_numbers.py`)、台帳 (`check_findings.py`)、主張の再計算 (`verify_findings.py`、27 項目) が通る状態。
+- 分析: `reports/` のレポート 15 本 (D16〜D31)、年度ごとの概況 12 年度 (D32・D37)、コラム 1 本 (D33)、方法の振り返り (D34)、発見の台帳 59 件。
+  2026-10-13 に全体を検証し直した (D35、`reports/README.md` の「検証の記録」)。2026-10-14 にドキュメントを整合させた (D36)。2026-10-16 に平成28〜26年度を書いた (D37)。
+- 検査: 本文の数字 (`check_numbers.py`)、台帳 (`check_findings.py`)、主張の再計算 (`verify_findings.py`、31 項目) が通る状態。
 - 手元にだけあるデータ (`data/raw/`、コミットしない):
   - 区分 A (北海道) の全年度 `A-1968.json`〜`A-2026.json` — `scripts/fetch.py`
   - 区分 B〜K の 2009・2014・2019・2023・2024・2025 年度 (K は 2023〜2025 のみ) — `fetch.py --section`
@@ -60,4 +60,4 @@
 
 ## 再開の一文
 
-「`HANDOVER.md` と `reports/yearly/README.md` を読み、次の年度 (平成28年度から) の概況を型どおりに書く。書いたら 3 つの検査と手の照合を通す。」
+「`HANDOVER.md` と `reports/yearly/README.md` を読み、次の年度 (平成25年度から) の概況を型どおりに書く。書いたら 3 つの検査と手の照合を通す。」

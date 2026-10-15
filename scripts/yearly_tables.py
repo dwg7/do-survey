@@ -44,6 +44,11 @@ def pct(v):
     return f'{100 * v:.0f}%'
 
 
+def head14(p):
+    """業務名の先頭 14 字。括弧の後を落とす (先頭の「(路線番号)」などは外してから)。"""
+    return re.sub(r'[（(].*', '', re.sub(r'^\s*[（(][^）)]*[）)]\s*', '', p))[:14]
+
+
 LEVEL = {0: '平年並み', 1: '平年と違うが傾向どおり', 2: '**予想外**', 3: '**かなり予想外**'}
 out = [f'# {era(Y)} 北海道測量概況 — 根拠表\n',
        f'`scripts/yearly_tables.py {Y}` が生成。国土地理院「公共測量実施情報」(北海道地方測量部、区分 A) ほかを dwg7 が編集・加工。'
@@ -207,6 +212,11 @@ out.append(f'| 業務名が自由記述 (7 字以上) の割合 | {pct(free / N)
 out.append(f'| 担当部署の記載がある割合 | {pct(sec / N)} | {pct(sum(1 for r in pr if r["charge_section"].strip()) / len(pr))} |')
 out.append(f'| 実施地域図 (面積) がある割合 | {pct(area / N)} | {pct(sum(1 for r in pr if r["area_km2"]) / len(pr))} |')
 out.append(f'| 分野が「不明」の割合 | {pct(fc["不明"] / N)} | {pct(sum(1 for r in pr if r["field"] == "不明") / len(pr))} |')
+out.append(f'| 業務名が 7 字未満の件数 | {N - free} | {sum(1 for r in pr if len(r["purpose"]) <= 6)} |')
+shr = [r for r in rows if len(r['purpose']) <= 6]
+if shr:
+    out.append('\n7 字未満の業務名 (今年): 多い語 ' + '、'.join(f'「{k or "(空)"}」{v}' for k, v in sorted(collections.Counter(r['purpose'].strip() for r in shr).items(), key=lambda kv: (-kv[1], kv[0]))[:5])
+               + '。発注主体 ' + '、'.join(f'{k} {v}' for k, v in sorted(collections.Counter(r['planner_type'] for r in shr).items(), key=lambda kv: (-kv[1], kv[0]))))
 notes = []
 if Y >= 2024:
     notes.append('令和6年度以降は道の農業農村整備の届出が段差で増えた後 (届出の比率 15% → 33%、D25)。令和5年度以前と農業の件数を比べる時は段差を差し引く。')
@@ -278,6 +288,11 @@ out.append('|---|---:|---:|')
 for pl, n in pc1.most_common(15):
     out.append(f'| {pl} | {pc0[pl]} | {n} |')
 
+for pl in sorted(pc1, key=lambda k: (pc0[k] - pc1[k], k))[:3]:   # 前年度から最も増えた計画機関、同点は名前の順
+    pp = collections.Counter(head14(r['purpose']) for r in rows if r['planner'] == pl)
+    out.append(f'\n前年度から増えた計画機関: {pl} {pc0[pl]} → {pc1[pl]} の業務名 (先頭 14 字): '
+               + '、'.join(f'{k} ({v})' for k, v in sorted(pp.items(), key=lambda kv: (-kv[1], kv[0]))[:6]))
+out.append('\n前年度から最も減った計画機関: ' + '、'.join(f'{pl} {pc0[pl]} → {pc1[pl]}' for pl in sorted(pc0, key=lambda k: (pc1[k] - pc0[k], k))[:5]))
 out.append('\n**件数の多い市町村の中身 (上位 8、発注主体 × 分野の上位 3)**\n')
 for c_, n in mcnt.most_common(8):
     sub = [r for r in rows if c_ in r['ml']]
@@ -302,8 +317,20 @@ for b in sb:
     big = max(keys, key=lambda k: c1[k] - c0[k])
     if c1[big] - c0[big] <= 0:
         continue
-    pp = collections.Counter(re.sub(r'[（(].*', '', r['purpose'])[:14] for r in rows if b in r['bl'] and (r['planner_type'], r['field']) == big)
+    pp = collections.Counter(head14(r['purpose']) for r in rows if b in r['bl'] and (r['planner_type'], r['field']) == big)
     out.append(f'  - 最も増えた {big[0]}・{big[1]} の業務名 (先頭 14 字): ' + '、'.join(f'{k} ({v})' for k, v in pp.most_common(8)))
+FZ = [f for f in ('農業農村', '道路', '防災・治水', '公物管理', '地籍・登記・課税', '位置基盤') if abs(z(Y, f'分野:{f}')) >= 2]
+for f in FZ:
+    c0 = collections.Counter(r['planner'] for r in by_year[Y - 1] if r['field'] == f)
+    c1 = collections.Counter(r['planner'] for r in rows if r['field'] == f)
+    keys = sorted(set(c0) | set(c1), key=lambda k: (-abs(c1[k] - c0[k]), k))[:8]   # 同点は名前の順
+    out.append(f'\n**平年から外れた分野の内訳: {f}** (計画機関、前年度 → 今年、差の大きい順): '
+               + '、'.join(f'{k} {c0[k]} → {c1[k]}' for k in keys))
+    big = max(keys, key=lambda k: (c1[k] - c0[k], k))
+    if c1[big] - c0[big] <= 0:
+        continue
+    pp = collections.Counter(head14(r['purpose']) for r in rows if r['field'] == f and r['planner'] == big)
+    out.append(f'  - 最も増えた {big} の業務名 (先頭 14 字): ' + '、'.join(f'{k} ({v})' for k, v in sorted(pp.items(), key=lambda kv: (-kv[1], kv[0]))[:8]))
 out.append('\n**振興局ごとの発注主体 (件数)**\n')
 out.append('| 振興局 | 計 | 道 | 開発局 | 市町村 |')
 out.append('|---|---:|---:|---:|---:|')
@@ -334,6 +361,11 @@ out.append('- 道の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy]
 out.append('- 位置基盤: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['field'] == '位置基盤')))
 out.append('- 冬 (1〜3 月) の受付: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['recept_date'][5:7] in ('01', '02', '03'))))
 out.append('- 航空レーザ: ' + series(lambda yy: sum(1 for r in by_year[yy] if '航空レーザ' in r['kinds'])))
+out.append('- 道の農業農村: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '農業農村')))
+out.append('- 道の防災・治水: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '防災・治水')))
+out.append('- 道の道路: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '道路')))
+out.append('- 開発局の道路: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道開発局' and r['field'] == '道路')))
+out.append('- 複数市町村の測量の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy] if int(r['n_munis']) > 1) / len(by_year[yy]))))
 out.append('- 測量のない市町村: ' + series(lambda yy: sum(1 for c_ in active if not any(c_ in r['ml'] for r in by_year[yy]))))
 
 d = ROOT / f'reports/yearly/{short(Y).lower().replace("r", "r0") if Y >= 2019 and Y - 2018 < 10 else short(Y).lower()}'

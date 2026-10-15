@@ -172,6 +172,14 @@ tk = lambda y: sum(1 for r in yr(y) if '十勝' in r['bur'] and r['planner_type'
 check('F54', '十勝の道の防災・治水 H28 → H29', (tk(2016), tk(2017)), (9, 45))
 rd = lambda y, t: sum(1 for r in yr(y) if r['field'] == '道路' and r['planner_type'] == t)
 check('F55', '道路の測量 道・開発局・市町村 H28 → H29', tuple((rd(2016, t), rd(2017, t)) for t in ('北海道', '北海道開発局', '市町村')), ((62, 46), (45, 29), (29, 24)))
+# F56〜F59: 平成26〜28年度の概況
+dn = lambda y, st=None: sum(1 for r in yr(y) if r['planner_type'] == '北海道' and r['field'] == '農業農村' and (st is None or r['stage'] == st))
+check('F56', '道の農業農村 H27 → H28 (うち計画)', ((dn(2015), dn(2016)), (dn(2015, '計画'), dn(2016, '計画'))), ((103, 166), (81, 146)))
+check('F57', '件数と道の件数 H26 → H27', ((len(yr(2014)), len(yr(2015))), tuple(sum(1 for r in yr(y) if r['planner_type'] == '北海道') for y in (2014, 2015))), ((628, 523), (364, 288)))
+up = lambda y, t: p(sum(1 for r in yr(y) if r['planner_type'] == t and r['m'] in (4, 5, 6, 7, 8, 9)), sum(1 for r in yr(y) if r['planner_type'] == t))
+check('F58', '上期の割合 H25 → H26 (道・市町村・開発局、%)', tuple((up(2013, t), up(2014, t)) for t in ('北海道', '市町村', '北海道開発局')), ((71, 77), (71, 81), (61, 61)))
+check('F59', '7 字未満の業務名 H25 → H26 と「道路計画」', (sum(1 for r in yr(2013) if len(r['purpose']) <= 6), sum(1 for r in yr(2014) if len(r['purpose']) <= 6),
+                                                sum(1 for r in yr(2014) if r['purpose'].strip() == '道路計画')), (32, 73, 35))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 
