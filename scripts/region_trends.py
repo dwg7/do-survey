@@ -81,6 +81,12 @@ for y in YEARS:
     cls = collections.Counter(active[c]['class'] for c in zero)
     low = sum(1 for c in active if 1 <= cnt[y][c] <= 2)
     out.append(f'| {era(y)} | {len(zero)} | {cls["市"]} | {cls["町"]} | {cls["村"]} | {low} |')
+tot3 = collections.Counter()
+for y in YEARS:
+    zero = [c for c in active if cnt[y][c] == 0]
+    tot3.update(active[c]['class'] for c in zero)
+    tot3['計'] += len(zero)
+out.append(f'| 17 年度の延べ | {tot3["計"]} | {tot3["市"]} | {tot3["町"]} | {tot3["村"]} | |')
 tz = [sum(1 for c in active if cnt[y][c] == 0) for y in TREND]
 tt = [sum(1 for r in rows if r['year'] == y) for y in TREND]
 mz, mt_ = statistics.mean(tz), statistics.mean(tt)

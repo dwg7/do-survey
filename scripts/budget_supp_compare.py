@@ -63,14 +63,26 @@ k = [kai[y] for y in Y]
 specs = [('当初', lambda y: ini[y]), ('当初 + 当該年度の補正', lambda y: ini[y] + sup[y]),
          ('当初 + 前年度の補正', lambda y: ini[y] + sup[y - 1]), ('前年度の補正だけ', lambda y: sup[y - 1])]
 out.append('## T2. 予算と届出の相関 (平成22〜令和7年度、16 年度)\n')
-out.append('| 予算の取り方 | 水準の相関 | 前年度からの増減の相関 | 増減の相関 (1 年度ずつ抜いた時の範囲) |')
-out.append('|---|---:|---:|---:|')
+out.append('| 予算の取り方 | 水準の相関 | 前年度からの増減の相関 | 95% 信頼区間 (概算) | 増減の組を 1 組ずつ抜いた範囲 | 年度を 1 つずつ系列から抜いた範囲 |')
+out.append('|---|---:|---:|---:|---:|---:|')
+import math
+
+
+def ci95(r, n):
+    zf, se = math.atanh(r), 1 / math.sqrt(n - 3)
+    return math.tanh(zf - 1.96 * se), math.tanh(zf + 1.96 * se)
+
+
 for lab, f in specs:
     v = [f(y) for y in Y]
     dv, dk = diffs(v), diffs(k)
+    r = corr(dv, dk)
+    lo, hi = ci95(r, len(dv))
     loo = [corr(dv[:i] + dv[i + 1:], dk[:i] + dk[i + 1:]) for i in range(len(dv))]
-    out.append(f'| {lab} | {corr(v, k):+.2f} | {corr(dv, dk):+.2f} | {min(loo):+.2f}〜{max(loo):+.2f} |')
-out.append('\n増減の相関は 15 組。1 年度ずつ抜いても符号と大きさが保たれるかで、少数の年に引っぱられていないかを見る。\n')
+    loy = [corr(diffs(v[:i] + v[i + 1:]), diffs(k[:i] + k[i + 1:])) for i in range(len(v))]
+    out.append(f'| {lab} | {corr(v, k):+.2f} | {r:+.2f} | {lo:+.2f}〜{hi:+.2f} | {min(loo):+.2f}〜{max(loo):+.2f} | {min(loy):+.2f}〜{max(loy):+.2f} |')
+out.append('\n増減の相関は 15 組。信頼区間は Fisher の z 変換による概算。組を抜く方は 1 つの増減の組の影響、年度を抜く方は 1 年度の値 '
+           '(その前後の 2 つの増減に効く) の影響を見る。4 つの取り方の区間は互いに重なり、「当初 + 前年度の補正が最もよく合う」は点の推定での順位で、差は確定的でない。\n')
 
 out.append('## T3. ゼロ国債と年度末の受付\n')
 zs = [zero[y] for y in YEARS]

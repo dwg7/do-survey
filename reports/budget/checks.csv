@@ -8,3 +8,6 @@ number,kind,value,note
 80,ref,reports/annual/overviews.md,上期の割合 令和2年度
 172,ref,reports/archive/stepping/compare.md,道の道路の件数 平成21年度 (C9)
 1758,ref,reports/supplementary/compare.md,平成24年度の補正 (直轄)
+0.26,ref,reports/supplementary/compare.md,当初 + 前年度の補正の増減の相関の 95% 信頼区間の下限
+0.88,ref,reports/supplementary/compare.md,同 上限
+923,ref,reports/supplementary/compare.md,ゼロ国債 平成26年度

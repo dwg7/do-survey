@@ -1,5 +1,5 @@
 number,kind,value,note
-216,ref,reports/yearly/r04/tables.md,道の上期の件数 令和4年度 (Y7)
-260,ref,reports/yearly/r04/tables.md,道の上期の件数 令和2年度 (Y7)
+216,expr,137+79,振興局の届出の和 (上期) 令和4年度
+258,expr,158+100,振興局の届出の和 (上期) 令和2年度
 3637,expr,948+2689,委託契約の和 令和2年度
 3861,expr,883+2978,委託契約の和 令和4年度
