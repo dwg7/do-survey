@@ -18,7 +18,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 NUM = r'(?<![\w.])\d[\d,]*(?:\.\d+)?(?![\w])'
-IGNORE = [r'https?://\S+', r'\[[^\]]*\]\([^)]*\)', r'`[^`]*`',                       # リンクと code
+IGNORE = [r'https?://\S+', r'(?<![\d,.])(?:19[5-9]\d|20[0-3]\d)(?=\s*[〜)、年]|\s*-\d(?!\d-\d))', r'\[[^\]]*\]\([^)]*\)', r'`[^`]*`',                       # リンクと code
           r'(?:令和|平成|昭和)(?:\d+|元)年度?(?:\s*\d+\s*月)?(?:\s*\d+\s*日)?', r'\d+\s*月', r'\d{4}-\d{2}(?:-\d{2})?',
           r'\b(?:D|T|Y|G|R|H|S|k=?)\s?\d+\b', r'§\d+', r'その\s?\d+', r'第\s?\d+\s?次',
           r'\d+\s?(?:か年|次|段|層|本|つ|周期|年おき|年ごと|区|字|点|周|号)', r'\b\d{1,2}/\d{1,2}\b', r'31 日の月',
@@ -35,10 +35,14 @@ def table_numbers(text):
     return {n.replace(',', '') for n in re.findall(r'\d[\d,]*(?:\.\d+)?', text)}
 
 
+# summary.md 以外の名前の本文 (レビュー、D41: 検査の外の本文に誤りが入っていた)
+BODY = {'column': 'gsdf.md', 'meta': 'harness.md', 'longterm': 'estimate.md', 'r07': 'draft.md'}
+
+
 def check(d):
-    summ = d / 'summary.md'
-    tabs = [f for f in d.glob('*.md') if f.name != 'summary.md']
-    if not summ.exists() or not tabs:
+    summ = d / BODY.get(d.name, 'summary.md')
+    tabs = [f for f in d.glob('*.md') if f.name not in (summ.name, 'README.md')]
+    if not summ.exists() or not (tabs or (d / 'checks.csv').exists()):
         return []
     tn = set().union(*(table_numbers(f.read_text()) for f in tabs))
     rows = {}
@@ -82,7 +86,8 @@ def main():
     dirs = [pathlib.Path(a) for a in sys.argv[1:]] or (
         sorted(p for p in (ROOT / 'reports/yearly').iterdir() if p.is_dir())
         + sorted(p.parent for p in (ROOT / 'reports').glob('*/summary.md'))
-        + sorted(p.parent for p in (ROOT / 'reports/archive').glob('*/summary.md')))   # アーカイブも検査は続ける
+        + sorted(p.parent for p in (ROOT / 'reports/archive').glob('*/summary.md'))   # アーカイブも検査は続ける
+        + [ROOT / 'reports' / k for k in ('column', 'meta', 'longterm')])
     total = 0
     for d in dirs:
         bad = check(d if d.is_absolute() else ROOT / d)

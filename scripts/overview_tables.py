@@ -82,7 +82,7 @@ for y in YEARS:
     for key in keys:
         e = evk[(y, key)]
         m, _ = normal(y, key)
-        za = f'{z_after(y, key):+.1f}' if y <= 2013 else ''
+        za = f'{z_after(y, key):+.1f}' if y <= 2020 else ''
         out.append(f'| {short(y)} | {key} | {fmt(key, IND[y][key])} | {fmt(key, m)} | {z(y, key):+.1f} | {zt(y, key):+.1f} | {za} | {LV[sur[(y, key)]]} | '
                    f'{e["kind"]} | {e["sub"]} | {e["cause"]} | [{e["ref"]}](../yearly/{e["ref"]}/summary.md) |')
 
@@ -147,11 +147,12 @@ for y in YEARS:
 # O5 期間の平均
 out.append('\n## O5. 期間ごとの平均\n')
 P2 = [('H21〜H23 (業務名が決まり文句)', range(2009, 2012)), ('H24〜H30', range(2012, 2019)), ('R1〜R5', range(2019, 2024)), ('R6〜R7 (届出の段差の後)', range(2024, 2026))]
-out.append('| 期間 | 件数 | 道 | 開発局 | 市町村 | 農業農村 | 道路 | 防災・治水 | 上期 | 6〜8 月 | 7 月 | 冬 (1〜3 月) | 測量のない市町村 |')
-out.append('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|')
+out.append('| 期間 | 件数 | 道の件数 | 開発局の件数 | 市町村の件数 | 道 | 開発局 | 市町村 | 農業農村 | 道路 | 防災・治水 | 上期 | 6〜8 月 | 7 月 | 冬 (1〜3 月) | 測量のない市町村 |')
+out.append('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|')
 for lab, ys in P2:
     mean = lambda f: statistics.mean(f(y) for y in ys)
-    out.append(f'| {lab} | {mean(lambda y: len(by_year[y])):.0f} | ' + ' | '.join(pct(mean(lambda y: IND[y][k])) for k in (
+    pc = lambda t: f'{mean(lambda y: sum(1 for r in by_year[y] if r["planner_type"] == t)):.0f}'
+    out.append(f'| {lab} | {mean(lambda y: len(by_year[y])):.0f} | {pc("北海道")} | {pc("北海道開発局")} | {pc("市町村")} | ' + ' | '.join(pct(mean(lambda y: IND[y][k])) for k in (
         '発注:北海道', '発注:北海道開発局', '発注:市町村', '分野:農業農村', '分野:道路', '分野:防災・治水', '上期の割合'))
         + f' | {pct(mean(lambda y: mshare(y, (6, 7, 8))))} | {pct(mean(lambda y: mshare(y, (7,))))} | {pct(mean(lambda y: mshare(y, (1, 2, 3))))} | '
         f'{mean(lambda y: sum(1 for c in active if not any(c in r["ml"] for r in by_year[y]))):.0f} |')
@@ -169,6 +170,8 @@ for lab, f in TESTS:
     ok = [y for y in YEARS if f(y)]
     ng = [y for y in YEARS if not f(y)]
     out.append(f'| {lab} | {len(ok)} / {len(YEARS)} | ' + '・'.join(short(y) for y in ok) + ' | ' + ('・'.join(short(y) for y in ng) or 'なし') + ' |')
+dk = [IND[y]['発注:北海道'] + IND[y]['発注:北海道開発局'] for y in YEARS]
+out.append(f'\n道と開発局の割合の和: 17 年度で {pct(min(dk))}〜{pct(max(dk))} (平均 {pct(statistics.mean(dk))})。')
 out.append('')
 
 d = ROOT / 'reports/overview'

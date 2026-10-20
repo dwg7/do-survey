@@ -1,2 +1,5 @@
 number,kind,value,note
 245,ref,reports/yearly/r07/tables.md,開発局の件数 (令和7年度)
+48,ref,reports/overview/tables.md,予想外の数 (O2 の計)
+81,ref,reports/overview/tables.md,道と開発局の割合の和の最小 (O6)
+89,ref,reports/overview/tables.md,同 最大

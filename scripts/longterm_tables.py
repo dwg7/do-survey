@@ -127,5 +127,15 @@ kinds = [t for t, _ in sum(body, collections.Counter()).most_common(8)]
 table('L8 目的「その他」の測量種別 (延べ)', ['測量種別'] + names, [[t] + [b[t] for b in body] for t in kinds])
 
 (ROOT / 'reports/longterm').mkdir(parents=True, exist_ok=True)
+# L6 届出の範囲の広がり (登録している機関と市町村)。estimate.md の根拠 2 の表 (レビュー、D41 で根拠表に移した)
+act = {m['code'] for m in munis if m['status'] == 'active'}
+body = []
+for nm, w in zip(names, ws):
+    body.append([nm, len(w), len({r['planner'] for r in w if r['planner_type'] == '北海道'}),
+                 len({r['planner'] for r in w if r['planner_type'] == '市町村'}),
+                 len({c for r in w for c in r['muni_codes'].split() if c in act})])
+table('L9 届出の範囲の広がり', ['期間', '件数 (3 年度)', '登録している道の機関', '市町村の計画機関', '測量のあった市町村'], body)
+pre = [r for r in rows if r['year'] < 2010]
+out.append(f'平成22年度より前の計画機関名: 「振興局」を含む {sum(1 for r in pre if "振興局" in r["planner"])} 件、「支庁」を含む {sum(1 for r in pre if "支庁" in r["planner"])} 件。\n')
 (ROOT / 'reports/longterm/tables.md').write_text('\n'.join(out) + '\n')
 print('wrote reports/longterm/tables.md')

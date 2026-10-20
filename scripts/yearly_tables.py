@@ -111,7 +111,10 @@ out.append('| 年度 | 当初 | 前年度の補正 | 当初 + 前年度の補正
 out.append('|---|---:|---:|---:|---:|---:|---:|')
 for yy in range(Y - 5, Y + 1):
     if yy in ini:
-        out.append(f'| {short(yy)} | {ini[yy]:,.0f} | {sup[yy - 1]:,.0f} | {ini[yy] + sup[yy - 1]:,.0f} | {sup[yy]:,.0f} | {zero[yy]:,.0f} | {kai[yy]} |')
+        if yy - 1 < 2009:   # 補正予算の表は平成21年度から。平成20年度の補正は 0 ではなく、ない (レビュー、D41)
+            out.append(f'| {short(yy)} | {ini[yy]:,.0f} | — | {ini[yy]:,.0f} (前年度の補正を含まない) | {sup[yy]:,.0f} | {zero[yy]:,.0f} | {kai[yy]} |')
+        else:
+            out.append(f'| {short(yy)} | {ini[yy]:,.0f} | {sup[yy - 1]:,.0f} | {ini[yy] + sup[yy - 1]:,.0f} | {sup[yy]:,.0f} | {zero[yy]:,.0f} | {kai[yy]} |')
 pb = {int(r['year']): r for r in csv.DictReader((ROOT / 'data/external/hokkaido-pref-budget-initial.csv').open())}
 dou = collections.Counter(r['year'] for yy in range(Y - 5, Y + 1) for r in by_year[yy] if r['planner_type'] == '北海道')
 out.append('\n**道 (当初予算の公共事業 補助事業費等、億円) と道の届出** (D25: 道の届出は予算の転換を写さない)\n')
@@ -151,11 +154,11 @@ fc = collections.Counter(r['field'] for r in rows)
 pc = collections.Counter(r['planner_type'] for r in rows)
 out.append('| 地勢の文 | 今年 | 判定の目安 |')
 out.append('|---|---:|---|')
-out.append(f'| 6〜8 月への集中 (北海道に固有、D28) | {pct(sh((6, 7, 8)))} (7 月 {pct(mc[7] / mt)}) | 他の都府県は 15〜45% (令和5〜7年度) |')
+out.append(f'| 6〜8 月への集中 (北海道に固有、D28) | {pct(sh((6, 7, 8)))} (7 月 {pct(mc[7] / mt)}) | 他の都府県は 15〜45% (令和5〜7年度の 3 年度の合計。単年度の最大は 38〜49%) |')
 out.append(f'| 冬 (1〜3 月) の空白 (雪国に共通、D28) | {pct(sh((1, 2, 3)))} | 雪国の県は 8% 以下 |')
 out.append(f'| 最多の受付月 | {mc.most_common(1)[0][0]} 月 | 北海道は 6〜7 月、雪国の他の県は 9〜10 月 |')
 out.append(f'| 農業農村が件数で最大 (農村型の地方に共通、D21) | {fc.most_common(1)[0][0]} {pct(fc.most_common(1)[0][1] / N)} | |')
-out.append(f'| 発注は道と国で 9 割 (D21) | 道 {pct(pc["北海道"] / N)}・開発局 {pct(pc["北海道開発局"] / N)}・市町村 {pct(pc["市町村"] / N)} | 市町村の発注は 10 地方で最少 |')
+out.append(f'| 発注は道と国で 8 割台後半 (D21、17 年度で 81〜89%) | 道 {pct(pc["北海道"] / N)}・開発局 {pct(pc["北海道開発局"] / N)}・市町村 {pct(pc["市町村"] / N)} | 市町村の発注は 10 地方で最少 |')
 out.append('\n**月別の受付**\n')
 out.append('| ' + ' | '.join(f'{m} 月' for m in (4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3)) + ' |')
 out.append('|' + '---:|' * 12)

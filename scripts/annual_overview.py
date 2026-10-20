@@ -266,7 +266,7 @@ for y, slot, kind, value, info in SLOTS:
     if kind == 'z':
         grp[GROUP(slot)][y].append((info, slot, value))
 for g, d in grp.items():
-    best = {y: max(v) for y, v in d.items()}
+    best = {y: max(v, key=lambda t: (t[0], abs(t[2]), t[1])) for y, v in d.items()}   # 同じ段階の中では |z| の大きい指標 (レビュー、D41)
     cnt = collections.Counter(b[0] for b in best.values())
     yrs = '、'.join(f'{short(y)} ({b[1].split(":")[-1]} {b[2]:+.1f})' for y, b in sorted(best.items()) if b[0] >= 2)
     sk.append(f'| {g} | {cnt[0]} | {cnt[1]} | {cnt[2]} | {cnt[3]} | {yrs} |')

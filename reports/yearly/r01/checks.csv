@@ -1,3 +1,5 @@
 number,kind,value,note
 86,expr,52+34,道と開発局の割合の和
 97,expr,237-140,開発局の届出の増加
+3677,ref,reports/yearly/h25/tables.md,当初 + 前年度の補正 平成24年度
+5074,ref,reports/yearly/h25/tables.md,同 平成25年度

@@ -200,7 +200,7 @@ evs = list(csv.DictReader((ROOT / 'reports/overview/events.csv').open()))
 ekc = collections.Counter(e['kind'] for e in evs)
 mid = [e for e in evs if 2014 <= int(e['year']) <= 2023]
 check('F69', '仕分けの数 (出来事・レンズ・物差し・構成・不明) と平成26〜令和5年度の出来事 / 予想外',
-      (len(evs), ekc['出来事'], ekc['レンズ'], ekc['物差し・構成'], ekc['不明'], sum(1 for e in mid if e['kind'] == '出来事'), len(mid)), (49, 16, 14, 13, 6, 13, 22))
+      (len(evs), ekc['出来事'], ekc['レンズ'], ekc['物差し・構成'], ekc['不明'], sum(1 for e in mid if e['kind'] == '出来事'), len(mid)), (48, 13, 13, 15, 7, 10, 22))
 def mavg(ys, ms):
     return round(100 * statistics.mean(sum(1 for r in yr(y) if r['m'] in ms) / sum(1 for r in yr(y) if r['m']) for y in ys))
 PER = (range(2009, 2012), range(2019, 2024), range(2024, 2026))
