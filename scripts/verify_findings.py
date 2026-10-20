@@ -220,6 +220,20 @@ check('F74', '十勝の道単改修 H29・他の年度の最大・全道 H29', (
       dk(2017, [r for r in yr(2017) if r['planner_type'] == '北海道'])), (36, 5, 41))
 dz = [r for r in yr(2016) if re.search('被害調査|災害調査|災害設計|災害復旧|災害助成|災害関連|災害査定', r['purpose'])]
 check('F75', 'H28 の災害の調査・設計の測量の数・8 月以前の数', (len(dz), sum(1 for r in dz if r['m'] in (4, 5, 6, 7, 8))), (9, 0))
+# F76・F77: 1 つの事業と届出の分け方 (D44)。事業の名前の正規化は method_tables.py とは別に書く
+bk = [r for r in C if '別海北部' in r['purpose']]
+NUM = '0-9０-９一二三四五六七八九十'
+def strip_no(p):
+    p = re.sub(r'[（(](補正|明許|繰越|ゼロ債|ゼロ国債|債務|単独)[)）]', '', p.strip())
+    for pat in (rf'その\s*[{NUM}]+', rf'第\s*[{NUM}]+\s*工区', rf'[{NUM}]+\s*工区', rf'[（(]\s*[{NUM}]+\s*[)）]', rf'[{NUM}]+\s*$'):
+        p = re.sub(pat, '', p)
+    return re.sub(r'[\s　・、,]', '', p)
+check('F76', '別海北部地区の届出・年度の数・異なる業務名', (len(bk), len({r['y'] for r in bk}), len({strip_no(r['purpose']) for r in bk})), (137, 15, 104))
+fr = [r for r in C if 2012 <= r['y'] <= 2025 and len(r['purpose'].strip()) > 6]
+def ratio(rs):
+    return round(len(rs) / len({(r['y'], r['planner'], strip_no(r['purpose'])) for r in rs}), 2)
+kd2 = lambda f: [r for r in fr if r['planner_type'] == '北海道開発局' and r['field'] == f]
+check('F77', '届出 / まとまり (全体・開発局の農業・道路)', (ratio(fr), ratio(kd2('農業農村')), ratio(kd2('道路'))), (1.10, 1.08, 1.07))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 
