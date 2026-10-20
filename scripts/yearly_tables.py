@@ -361,6 +361,10 @@ for f in FZ:
         continue
     pp = collections.Counter(head14(r['purpose']) for r in rows if r['field'] == f and r['planner'] == big)
     out.append(f'  - 最も増えた {big} の業務名 (先頭 14 字): ' + '、'.join(f'{k} ({v})' for k, v in sorted(pp.items(), key=lambda kv: (-kv[1], kv[0]))[:8]))
+# 災害の直後の調査・設計 (被害調査・災害調査・災害設計・災害復旧) の測量 (D42: 災害の写り方を受付日で見る)
+dz = sorted((r for r in rows if re.search('被害調査|災害調査|災害設計|災害復旧|災害助成|災害関連|災害査定', r['purpose'])), key=lambda r: (r['recept_date'], r['purpose']))
+out.append(f'\n**業務名に災害の調査・設計・復旧の語 (被害調査・災害調査・災害設計・災害復旧・災害助成・災害関連・災害査定) がある測量 {len(dz)} 件**'
+           + ('' if not dz else ' (受付日順、先頭 14 件): ' + '、'.join(f'{r["recept_date"]} {"・".join(r["bl"]) or "—"} {r["planner_type"]} {r["purpose"].strip()[:24]}' for r in dz[:14])))
 out.append('\n**振興局ごとの発注主体 (件数)**\n')
 out.append('| 振興局 | 計 | 道 | 開発局 | 市町村 |')
 out.append('|---|---:|---:|---:|---:|')
@@ -397,6 +401,13 @@ out.append('- 道の防災・治水: ' + series(lambda yy: sum(1 for r in by_yea
 out.append('- 道の道路: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and r['field'] == '道路')))
 out.append('- 開発局の道路: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道開発局' and r['field'] == '道路')))
 out.append('- 複数市町村の測量の割合: ' + series(lambda yy: pct(sum(1 for r in by_year[yy] if int(r['n_munis']) > 1) / len(by_year[yy]))))
+TK = lambda yy: [r for r in by_year[yy] if r['planner_type'] == '北海道' and '十勝' in r['bl']]
+out.append('- 十勝の道の防災・治水: ' + series(lambda yy: sum(1 for r in TK(yy) if r['field'] == '防災・治水')))
+out.append('- うち業務名に「災害」: ' + series(lambda yy: sum(1 for r in TK(yy) if r['field'] == '防災・治水' and '災害' in r['purpose'])))
+out.append('- 十勝の道の「道単…改修」(業務名に「道単」と「改修」): ' + series(lambda yy: sum(1 for r in TK(yy) if '道単' in r['purpose'] and '改修' in r['purpose'])))
+out.append('- 全道の道の「道単…改修」: ' + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and '道単' in r['purpose'] and '改修' in r['purpose'])))
+out.append('- 平成28年台風 10 号の災害復旧助成・災害関連の 3 河川 (ペケレベツ川・パンケ新得川・芽室川) の名を含む道の測量 (D42): '
+           + series(lambda yy: sum(1 for r in by_year[yy] if r['planner_type'] == '北海道' and re.search('ペケレベツ|パンケ新得|芽室川', r['purpose']))))
 out.append('- 測量のない市町村: ' + series(lambda yy: sum(1 for c_ in active if not any(c_ in r['ml'] for r in by_year[yy]))))
 
 d = ROOT / f'reports/yearly/{short(Y).lower().replace("r", "r0") if Y >= 2019 and Y - 2018 < 10 else short(Y).lower()}'

@@ -1,3 +1,6 @@
 number,kind,value,note
 86,expr,57+29,道と開発局の割合の和
 156,ref,reports/yearly/h30/tables.md,道の農業農村 平成30年度 (Y7)
+172,ref,data/external/typhoon-2016-recovery.csv,北海道の改良復旧事業の採択 (国土交通省 平成29年3月15日)
+80.6,ref,data/external/typhoon-2016-recovery.csv,ペケレベツ川災害復旧助成事業の全体事業費
+22.2,ref,data/external/typhoon-2016-recovery.csv,パンケ新得川災害復旧助成事業の全体事業費

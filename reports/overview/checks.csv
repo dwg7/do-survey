@@ -4,3 +4,7 @@ number,kind,value,note
 88,expr,437-349,道の増分
 152,expr,797-645,件数の増分 (令和元〜5 → 令和6〜7年度)
 124,expr,437-313,道の増分
+127,ref,reports/yearly/r06/tables.md,道の農業農村 令和5年度 (Y7)
+277,ref,reports/yearly/r06/tables.md,道の農業農村 令和6年度 (Y7)
+849,ref,reports/contracts/compare.md,産業振興部の委託契約 令和5年度 (上半期)
+847,ref,reports/contracts/compare.md,同 令和6年度

@@ -210,6 +210,16 @@ FL6 = ('農業農村', '道路', '防災・治水', '公物管理', '地籍・�
 topf = lambda y: collections.Counter(r['field'] for r in yr(y) if r['field'] in FL6).most_common(1)[0][0]
 check('F71', '最大の分野が道路の年度・農業農村の年度', (tuple(y for y in range(2009, 2026) if topf(y) == '道路'), min(y for y in range(2009, 2026) if topf(y) == '農業農村'),
       all(topf(y) == '農業農村' for y in range(2012, 2026))), ((2009, 2010, 2011), 2012, True))
+# F54・F74・F75: 平成28年台風 10 号 (D42)
+tkd = lambda y: [r for r in yr(y) if r['planner_type'] == '北海道' and '十勝' in r['bur']]
+check('F54b', '被災 3 河川の名を含む道の測量 H29・十勝の道の防災のうち「災害」H29',
+      (sum(1 for r in yr(2017) if r['planner_type'] == '北海道' and re.search('ペケレベツ|パンケ新得|芽室川', r['purpose'])),
+       sum(1 for r in tkd(2017) if r['field'] == '防災・治水' and '災害' in r['purpose'])), (11, 5))
+dk = lambda y, rs: sum(1 for r in rs if '道単' in r['purpose'] and '改修' in r['purpose'])
+check('F74', '十勝の道単改修 H29・他の年度の最大・全道 H29', (dk(2017, tkd(2017)), max(dk(y, tkd(y)) for y in range(2009, 2026) if y != 2017),
+      dk(2017, [r for r in yr(2017) if r['planner_type'] == '北海道'])), (36, 5, 41))
+dz = [r for r in yr(2016) if re.search('被害調査|災害調査|災害設計|災害復旧|災害助成|災害関連|災害査定', r['purpose'])]
+check('F75', 'H28 の災害の調査・設計の測量の数・8 月以前の数', (len(dz), sum(1 for r in dz if r['m'] in (4, 5, 6, 7, 8))), (9, 0))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 
