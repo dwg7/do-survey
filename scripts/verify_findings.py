@@ -255,6 +255,15 @@ for y in range(2009, 2026):
         t1[c] += v == vs[0]
         t3[c] += v >= vs[2]
 check('F82', '別海町の最多 (同数を含む)・上位 3、札幌市の上位 3', (t1['01691'], t3['01691'], t3['01100']), (6, 12, 7))
+# F83: 市町村の航空写真と評価替えの基準年度 (D49)。直近 2 回の登録が基準年度の何年前か
+orth = collections.defaultdict(set)
+for r in C:
+    if r['planner_type'] == '市町村' and r['y'] <= 2026 and ('写真地図作成' in r['kinds'] or 'オルソ' in r['kinds']):
+        orth[r['planner']].add(r['y'])
+lead2 = lambda pl: tuple(((2018 - y) % 3) or 3 for y in sorted(orth[pl])[-2:])
+check('F83', '直近 2 回の登録の基準年度までの年数 (2 年前の組・1 年前の組)',
+      (tuple(lead2('北海道' + m) for m in ('札幌市', '函館市', '稚内市', '室蘭市')), tuple(lead2('北海道' + m) for m in ('中標津町', '倶知安町', '恵庭市', '帯広市', '千歳市'))),
+      (((2, 2),) * 4, ((1, 1),) * 5))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 

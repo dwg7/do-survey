@@ -173,6 +173,66 @@ out.append('| 国勢調査の年度からのずれ | 0 (国勢調査の年度) |
 out.append('|---|---:|---:|---:|---:|---:|')
 out.append('| 件数 | ' + ' | '.join(f'{ph[k]} ({100 * ph[k] / len(yy):.0f}%)' for k in range(5)) + ' |')
 out.append(f'\n一様なら各 20%。カイ二乗 {chi:.1f} (自由度 4、5% の棄却点 9.49)。\n')
+# T11 次の更新の目安 (D49): 過去の間隔 (2 年以上) の中央値を最後の年度に足す。外部の計画では確かめていない目安。
+NOW = 2026   # 当年度 (途中)
+
+
+def outlook(ys):
+    ys = sorted(ys)
+    gs = [b - a for a, b in zip(ys, ys[1:]) if b - a >= 2]
+    if not gs:
+        return None
+    m = int(statistics.median(gs))
+    nxt = ys[-1] + m
+    state = '当年度に登録あり' if ys[-1] == NOW else ('間隔を過ぎた (まだ登録がない)' if nxt < NOW else ('当年度が目安' if nxt == NOW else '先'))
+    return ys, gs, m, nxt, state
+
+
+# 市町村の航空写真は業務名 (固定資産の語) ではなく測量の種類 (写真地図作成・オルソ) で拾う: 業務名に「固定資産」がなくても同じ周期で続く (D49)
+ortho = collections.defaultdict(set)
+for r in rows:
+    if r['planner_type'] == '市町村' and r['year'] <= NOW and ('写真地図作成' in r['kinds'] or 'オルソ' in r['kinds']):
+        ortho[r['planner']].add(r['year'])
+out.append('\n## T11a. 市町村の航空写真 (写真地図作成・オルソ) の周期と固定資産税の評価替え\n')
+out.append('測量の種類に「写真地図作成」か「オルソ」がある市町村の登録 (3 回以上)。評価替えの基準年度は平成30 (2018)・令和3 (2021)・6 (2024)・9 (2027)・12 (2030) 年度。'
+           '「基準年度の何年前か」は、各登録の年度から次の基準年度までの年数。\n')
+out.append('| 市町村 | 登録の年度 | 間隔 (年) | 基準年度の何年前か | 次の目安 | 状態 |')
+out.append('|---|---|---|---|---|---|')
+for p_, ys in sorted(ortho.items(), key=lambda x: (-len(x[1]), x[0])):
+    if len(ys) < 3:
+        continue
+    ys_ = sorted(ys)
+    gs = [b - a for a, b in zip(ys_, ys_[1:])]
+    lead = [((2018 - y) % 3) or 3 for y in ys_]
+    o = outlook(ys)
+    nxt, state = (o[3], o[4]) if o else (None, '—')
+    out.append(f'| {p_} | ' + '、'.join(era(y) for y in ys_) + f' | {"・".join(str(x) for x in gs)} | {"・".join(str(x) for x in lead)} | '
+               + (f'{era(nxt)} ({nxt})' if nxt else '—') + f' | {state} |')
+out.append('')
+NEWFORM = re.compile(r'点群|ＭＭＳ|MMS|車載写真レーザ|地理情報システム|ＧＩＳ|GIS|デジタル化')
+nf = sorted((r for r in rows if r['planner_type'] == '市町村' and 2019 <= r['year'] <= NOW and NEWFORM.search(r['purpose'] + r['kinds'])), key=lambda r: (r['year'], r['planner']))
+out.append(f'\n## T12. 市町村の新しい形の地図の整備 (令和元年度以降、業務名か測量の種類に点群・MMS・GIS・デジタル化の語がある登録 {len(nf)} 件)\n')
+out.append('| 年度 | 計画機関 | 業務名 (先頭 30 字) | 測量の種類 (先頭 30 字) |')
+out.append('|---|---|---|---|')
+for r in nf:
+    out.append(f'| {era(r["year"])} | {r["planner"]} | {r["purpose"].strip()[:30]} | {r["kinds"][:30]} |')
+out.append('')
+
+for title, src, minn in (('都市計画図 (3 回以上登録した計画機関)', by, 3),):
+    out.append(f'\n## T11b. 次の更新の目安: {title}\n')
+    out.append('過去の更新の間隔 (2 年以上) の中央値を、最後の登録の年度に足した目安。間隔がそろっているかも並べる。令和8年度 (2026) は途中。\n')
+    out.append('| 計画機関 | 登録の年度 | 間隔 (年) | 間隔の中央値 | 次の目安 | 状態 |')
+    out.append('|---|---|---|---:|---|---|')
+    for p_, ys in sorted(src.items(), key=lambda x: (x[0])):
+        if len(ys) < minn:
+            continue
+        o = outlook(ys)
+        if not o:
+            continue
+        ys_, gs, m, nxt, state = o
+        out.append(f'| {p_} | ' + '、'.join(era(y) for y in ys_) + f' | {"・".join(str(x) for x in gs)} | {m} | {era(nxt)} ({nxt}) | {state} |')
+    out.append('')
+
 (ROOT / 'reports/cityplan').mkdir(parents=True, exist_ok=True)
 (ROOT / 'reports/cityplan/tables.md').write_text('\n'.join(out) + '\n')
 print('wrote reports/cityplan/tables.md')
