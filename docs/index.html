@@ -25,6 +25,10 @@
         if (script) openmct.setAssetPath(script.src.replace(/openmct\.js(?:\?.*)?$/, ''));
         openmct.install(openmct.plugins.LocalStorage());
         openmct.install(openmct.plugins.UTCTimeSystem());
+        // ダッシュボードは時刻を使わないが、Open MCT は起動時に URL の tc.* を時刻系の key から書くので、
+        // 時刻系を選んでおかないと undefined の key を読んで落ちる (D47)。固定モード・直近 1 日にしておく。
+        openmct.time.setTimeSystem('utc');
+        openmct.time.setMode('fixed', { start: Date.now() - 24 * 60 * 60 * 1000, end: Date.now() });
         openmct.install(openmct.plugins.Espresso());
         openmct.install(DoSurveyPlugin({ dataUrl: './data/', doDataUrl: './vendor/do/data/' }));
         openmct.start('#app');

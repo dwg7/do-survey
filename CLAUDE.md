@@ -53,7 +53,7 @@
 - 描画は `docs/vendor/do/tabularmap.js` の `TabularMap.create`。値は段階の番号 (順序尺度 6 段、区切りは選んだ年数で
   伸縮)。マウスオーバーは「件数」と「計画機関」(全部、件数の多い順) だけで、`survey-plugin.js` が描画コアのツールチップの中身を
   差し替える。区切りやツールチップを変えたら DECISIONS に書く。
-- Open MCT は unpkg の 4.3.1 に固定 (tabularmaps/do と同じ)。`window.SharedWorker = undefined` を先に置く。
+- Open MCT は unpkg の 4.3.1 に固定 (tabularmaps/do と同じ)。`window.SharedWorker = undefined` を先に置く。時刻は使わないが、時刻系 `utc` と固定モードを設定しておく (しないと起動時に落ちる、D47)。
 - ローカル確認は `.claude/launch.json` の `docs` (python http.server 8767)。ツリーは見えている分しか描かれないので、
   奥のリーフは URL `#/browse/dosurvey:root/dosurvey:map:range` や
   `#/browse/dosurvey:root/dosurvey:folder:years/dosurvey:map:year:<年度>` で開く。

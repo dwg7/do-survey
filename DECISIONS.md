@@ -522,3 +522,13 @@ hfu の指示で、ダッシュボード用に受付年度 2026 (令和8年度) 
 方法論の M6 と台帳の F76 (別海北部地区の届出の数) は当年度を含んでいて取り直しのたびに動くので、令和7年度までに限った (136 件・14 年度・104 の業務名)。
 ローカルで令和8年度の地図が「698 件 (2026-10-15 受付分まで)」で描かれることを確かめた。コンソールの `Cannot read properties of undefined (reading 'key')` は
 取り直す前のデータでも同じく出る既知のもので、この更新とは関係しない (未調査)。
+
+## D47 (2026-10-21) ダッシュボードの起動時のコンソールエラー (`reading 'key'`) を直す
+
+D46 で未調査として残した `Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'key')` を調べた。
+ページを読み込んだ時だけ 1 回出て (ツリーでの移動では出ない)、データにはよらない。headless Chromium の DevTools プロトコルで
+スタックを取ると、Open MCT 4.3.1 の URL と時刻の同期 (`setUrlFromTimeApi`) が起動時に `openmct.time.getTimeSystem().key` を読んでいた。
+`docs/index.html` は `UTCTimeSystem` を入れるだけで時刻系を選んでいなかったので、時刻系が undefined のままだった (Open MCT の不具合ではなく、こちらの設定漏れ)。
+- `docs/index.html` で `openmct.time.setTimeSystem('utc')` と固定モード (直近 1 日) を設定した。ダッシュボードは時刻を使わないので、値に意味はない。
+- 副作用: URL に `tc.mode=fixed&tc.startBound=…&tc.endBound=…&tc.timeSystem=utc` が付く。古い URL (`tc.mode=local` だけのもの) でも開ける。
+- 確かめたこと: 年度の地図・期間の地図・概要でエラーが出ず、令和8年度の地図が「698 件 (2026-10-15 受付分まで)」で描かれる。
