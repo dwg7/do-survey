@@ -174,6 +174,58 @@ dk = [IND[y]['発注:北海道'] + IND[y]['発注:北海道開発局'] for y in 
 out.append(f'\n道と開発局の割合の和: 17 年度で {pct(min(dk))}〜{pct(max(dk))} (平均 {pct(statistics.mean(dk))})。')
 out.append('')
 
+# O7〜O11: 測量と北海道の社会のつながり (D48)
+ALLY = sorted(y for y in by_year if 1983 <= y <= 2025)   # 当年度 (途中) は除く
+out.append('\n## O7. 段階の構成 (平成24〜令和7年度、業務名から段階が分かる時期)\n')
+fr = [r for y in range(2012, 2026) for r in by_year[y]]
+stc = collections.Counter(r['stage'] for r in fr)
+known = sum(v for k, v in stc.items() if k != '不明')
+out.append('| 段階 | 件数 | 割合 (不明を除く) |')
+out.append('|---|---:|---:|')
+for k, v in stc.most_common():
+    out.append(f'| {k} | {v} | {pct(v / known) if k != "不明" else "—"} |')
+out.append(f'| 計 | {len(fr)} | |')
+out.append(f'\n計画と用地 (工事の前の段階) の和: 不明を除く {pct((stc["計画"] + stc["用地"]) / known)}。業務名に「除雪」がある測量 {sum(1 for r in fr if "除雪" in r["purpose"])} 件、「維持」{sum(1 for r in fr if "維持" in r["purpose"])} 件。\n')
+out.append('## O8. 開発局の届出の多い年度 (昭和58〜令和7年度)\n')
+kd = {y: sum(1 for r in by_year[y] if r['planner_type'] == '北海道開発局') for y in ALLY}
+tot = {y: len(by_year[y]) for y in ALLY}
+out.append('| 順位 | 年度 | 開発局の届出 | 全体の届出 |')
+out.append('|---:|---|---:|---:|')
+for i, (y, v) in enumerate(sorted(kd.items(), key=lambda kv: (-kv[1], kv[0]))[:5], 1):
+    out.append(f'| {i} | {short(y)} ({y}) | {v} | {tot[y]} |')
+ty, tv = max(tot.items(), key=lambda kv: (kv[1], kv[0]))
+out.append(f'\n全体の届出の最多は {short(ty)} ({ty}) の {tv} 件。\n')
+out.append('## O9. 航空レーザを含む測量の年平均\n')
+las = {y: sum(1 for r in by_year[y] if '航空レーザ' in r['kinds']) for y in YEARS}
+out.append(f'平成21〜30年度 {statistics.mean(las[y] for y in range(2009, 2019)):.1f} 件、令和元〜7年度 {statistics.mean(las[y] for y in range(2019, 2026)):.1f} 件。'
+           f'最多は {short(max(las, key=lambda y: (las[y], y)))} の {max(las.values())} 件。\n')
+out.append('## O10. 振興局ごとの分野の構成 (平成24〜令和5年度、令和6年度の届出の段差の前)\n')
+F4 = ['農業農村', '道路', '防災・治水', '位置基盤']
+out.append('| 振興局 | 関わった測量 | ' + ' | '.join(F4) + ' | 最大の分野 |')
+out.append('|---|---:|' + '---:|' * len(F4) + '---|')
+for b in BUREAUS:
+    sb = [r for y in range(2012, 2024) for r in by_year[y] if b in r['bl']]
+    fc = collections.Counter(r['field'] for r in sb)
+    out.append(f'| {b} | {len(sb)} | ' + ' | '.join(pct(fc[f] / len(sb)) for f in F4) + f' | {fc.most_common(1)[0][0]} |')
+out.append('\n## O11. 件数の多い市町村の常連 (平成21〜令和7年度の 17 年度)\n')
+top1, top1t, top3t = collections.Counter(), collections.Counter(), collections.Counter()
+for y in YEARS:
+    c = collections.Counter(x for r in by_year[y] for x in r['ml'] if x in active)
+    vals = sorted(c.values(), reverse=True)
+    for x, v in c.items():
+        if v == vals[0]:
+            top1t[x] += 1
+            if vals.count(vals[0]) == 1:
+                top1[x] += 1
+        if v >= vals[2]:
+            top3t[x] += 1
+popu = {r['code']: int(r['population']) for r in csv.DictReader((ROOT / 'data/external/hokkaido-population-2026.csv').open())}
+out.append('| 市町村 | 人口 (2026-01-01) | 道内最多 (単独) の年度の数 | 道内最多 (同数を含む) | 上位 3 (同数を含む) の年度の数 |')
+out.append('|---|---:|---:|---:|---:|')
+for c_, v in sorted(top3t.items(), key=lambda kv: (-kv[1], kv[0]))[:8]:
+    out.append(f'| {active[c_]["fullName"]} | {popu.get(c_, 0):,} | {top1[c_]} | {top1t[c_]} | {v} |')
+out.append('\n同じ件数の年度は、同数の市町村をすべて数える (同数を含む)。人口は `data/external/hokkaido-population-2026.csv` (住民基本台帳、2026-01-01)。\n')
+
 d = ROOT / 'reports/overview'
 (d / 'tables.md').write_text('\n'.join(out) + '\n')
 print(f'wrote {d / "tables.md"} (予想外 {len(sur)} 件、仕分け {len(ev)} 行が一致)')

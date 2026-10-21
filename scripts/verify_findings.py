@@ -234,6 +234,27 @@ def ratio(rs):
     return round(len(rs) / len({(r['y'], r['planner'], strip_no(r['purpose'])) for r in rs}), 2)
 kd2 = lambda f: [r for r in fr if r['planner_type'] == '北海道開発局' and r['field'] == f]
 check('F77', '届出 / まとまり (全体・開発局の農業・道路)', (ratio(fr), ratio(kd2('農業農村')), ratio(kd2('道路'))), (1.10, 1.08, 1.07))
+# F78〜F82: 測量と北海道の社会のつながり (D48)
+fs = [r for r in C if 2012 <= r['y'] <= 2025]
+kn = [r for r in fs if r['stage'] != '不明']
+check('F78', '計画と用地の割合 (%)・除雪の件数・届出の数', (p(sum(1 for r in kn if r['stage'] in ('計画', '用地')), len(kn)), sum(1 for r in fs if '除雪' in r['purpose']), len(fs)), (86, 7, 9106))
+kdy = {y: sum(1 for r in yr(y) if r['planner_type'] == '北海道開発局') for y in range(1983, 2026)}
+t5 = sorted(kdy, key=lambda y: -kdy[y])[:5]
+check('F79', '開発局の届出の上位 5 年度 (昇順) と最多', (tuple(sorted(t5)), max(kdy.values())), ((2021, 2022, 2023, 2024, 2025), 276))
+lz = {y: sum(1 for r in yr(y) if '航空レーザ' in r['kinds']) for y in range(2009, 2026)}
+check('F80', '航空レーザの年平均 (平成21〜30・令和元〜7) と最多', (round(statistics.mean(lz[y] for y in range(2009, 2019)), 1), round(statistics.mean(lz[y] for y in range(2019, 2026)), 1), max(lz.values())), (8.9, 22.4, 31))
+bf = lambda b, f: p(sum(1 for r in C if 2012 <= r['y'] <= 2023 and b in r['bur'] and r['field'] == f), sum(1 for r in C if 2012 <= r['y'] <= 2023 and b in r['bur']))
+check('F81', '空知・根室の農業農村の割合 (%)', (bf('空知', '農業農村'), bf('根室', '農業農村')), (63, 56))
+mun = json.loads((ROOT / 'docs/vendor/do/data/municipalities.json').read_text())['municipalities']
+actc = {m['code'] for m in mun if m['status'] == 'active'}
+t1, t3 = collections.Counter(), collections.Counter()
+for y in range(2009, 2026):
+    cc = collections.Counter(c for r in yr(y) for c in r['mun'] if c in actc)
+    vs = sorted(cc.values(), reverse=True)
+    for c, v in cc.items():
+        t1[c] += v == vs[0]
+        t3[c] += v >= vs[2]
+check('F82', '別海町の最多 (同数を含む)・上位 3、札幌市の上位 3', (t1['01691'], t3['01691'], t3['01100']), (6, 12, 7))
 a7 = collections.Counter(r['aim'] for r in yr(2025))
 check('F47', '令和7年度の公共事業執行・防災減災', (a7['公共事業執行'], a7['防災減災']), (128, 134))
 

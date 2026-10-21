@@ -1,6 +1,6 @@
 # HANDOVER.md — 引き継ぎ (2026-10-16 時点)
 
-規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D46)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
+規約は `CLAUDE.md`、経緯は `DECISIONS.md` (D1〜D48)、列と読み替えは `SCHEMA.md`、レポートの案内は `reports/README.md`。
 このファイルは「今どこまで進んでいて、次に何をするか」と、ファイルに書いていない作業の型だけを書く (都度まるごと書き直す)。
 
 ## 今の段階
@@ -22,9 +22,9 @@
 
 - データ: `data/surveys.parquet` (受付年度 1983〜2026 の 17,583 件、2026 年度は 2026-10-21 に取り直して 10/15 受付分まで。それ以前の年度は 2026-09-24 取得)。
 - ダッシュボード: https://dwg7.unopengis.org/do-survey/ (GitHub Pages、main の /docs)。D10〜D15。
-- 分析: `reports/` のレポート 16 本 (D16〜D31・D39。うち 2 本は `reports/archive/` に移した、D40)、年度ごとの概況 17 年度 (D32・D37・D38)、コラム 1 本 (D33)、方法の振り返り (D34)、発見の台帳 77 件、長期概況 (D39)。
+- 分析: `reports/` のレポート 16 本 (D16〜D31・D39。うち 2 本は `reports/archive/` に移した、D40)、年度ごとの概況 17 年度 (D32・D37・D38)、コラム 1 本 (D33)、方法の振り返り (D34)、発見の台帳 82 件、長期概況 (D39)。
   2026-10-13 に全体を検証し直した (D35、`reports/README.md` の「検証の記録」)。2026-10-14 にドキュメントを整合させた (D36)。2026-10-16 に平成28〜21年度を書いた (D37・D38)。
-- 検査: 本文の数字 (`check_numbers.py`)、台帳 (`check_findings.py`)、主張の再計算 (`verify_findings.py`、45 項目) が通る状態。
+- 検査: 本文の数字 (`check_numbers.py`)、台帳 (`check_findings.py`)、主張の再計算 (`verify_findings.py`、50 項目) が通る状態。
 - 手元にだけあるデータ (`data/raw/`、コミットしない):
   - 区分 A (北海道) の全年度 `A-1968.json`〜`A-2026.json` — `scripts/fetch.py`
   - 区分 B〜K の 2009・2014・2019・2023・2024・2025 年度 (K は 2023〜2025 のみ) — `fetch.py --section`
