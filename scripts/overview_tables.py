@@ -72,7 +72,7 @@ out = ['# 長期概況 (平成21〜令和7年度) — 根拠表\n',
 
 # O1 出来事の表
 out.append('## O1. 出来事の表 — 17 年度の予想外と仕分け\n')
-out.append('| 年度 | 指標 | 今年 | 平年 | z (平年) | z (傾向) | z (後の 5 年度) | 段階 | 種類 | 細目 | 中身 | 概況 |')
+out.append('| 年度 | 指標 | 今年 | 平年 | z (平年) | z (短期傾向) | z (後の 5 年度) | 段階 | 種類 | 細目 | 中身 | 概況 |')
 out.append('|---|---|---:|---:|---:|---:|---:|---|---|---|---|---|')
 for y in YEARS:
     keys = [key for g, ks, k in GROUPS for key in ks if (y, key) in sur]
@@ -121,8 +121,8 @@ for lab, ys in periods:
 nz = [y for y in YEARS if not any(int(e['year']) == y for e in ev)]
 out.append(f'\n予想外のない年度: {"・".join(short(y) for y in nz)}。')
 
-# O4 地勢の系列
-out.append('\n## O4. 地勢の系列 (年度ごと)\n')
+# O4 長期構造の系列
+out.append('\n## O4. 長期構造の系列 (年度ごと)\n')
 
 
 def mshare(y, ms):
@@ -157,14 +157,14 @@ for lab, ys in P2:
         + f' | {pct(mean(lambda y: mshare(y, (6, 7, 8))))} | {pct(mean(lambda y: mshare(y, (7,))))} | {pct(mean(lambda y: mshare(y, (1, 2, 3))))} | '
         f'{mean(lambda y: sum(1 for c in active if not any(c in r["ml"] for r in by_year[y]))):.0f} |')
 
-# O6 地勢の文が成り立つ年度
-out.append('\n## O6. 地勢の文が成り立つ年度\n')
+# O6 長期構造の文が成り立つ年度
+out.append('\n## O6. 長期構造の文が成り立つ年度\n')
 TESTS = [('6〜8 月が 45% を超える (他の都府県の令和5〜7年度の最大)', lambda y: mshare(y, (6, 7, 8)) > 0.45),
          ('7 月が 20% 以上', lambda y: mshare(y, (7,)) >= 0.20),
          ('冬 (1〜3 月) が 3% 以下', lambda y: mshare(y, (1, 2, 3)) <= 0.03),
          ('農業農村が件数で最大の分野', lambda y: collections.Counter(r['field'] for r in by_year[y] if r['field'] in FL).most_common(1)[0][0] == '農業農村'),
          ('道と開発局で 85% 以上', lambda y: IND[y]['発注:北海道'] + IND[y]['発注:北海道開発局'] >= 0.85)]
-out.append('| 地勢の文 | 成り立つ年度の数 | 成り立つ年度 | 成り立たない年度 |')
+out.append('| 長期構造の文 | 成り立つ年度の数 | 成り立つ年度 | 成り立たない年度 |')
 out.append('|---|---:|---|---|')
 for lab, f in TESTS:
     ok = [y for y in YEARS if f(y)]

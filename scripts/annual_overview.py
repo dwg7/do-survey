@@ -131,12 +131,12 @@ def word(zv, more='多い', less='少ない', k=1, ztr=None):
     else:
         return '平年並み'
     if ztr is not None and abs(ztr) < t1:
-        w += ' (ただし近年の傾向どおり)'
+        w += ' (ただし短期傾向どおり)'
     return w
 
 
 def level(zv, ztr, k=1):
-    """文の情報の段階: 0 平年並み、1 平年と違うが傾向どおり、2 予想外 (平年からも傾向からも外れる)、3 かなり予想外。"""
+    """文の情報の段階: 0 平年並み、1 平年と違うが短期傾向どおり、2 予想外 (平年からも短期傾向からも外れる)、3 かなり予想外。"""
     t1, t2 = THR[k]
     if abs(zv) < t1:
         return 0
@@ -260,7 +260,7 @@ for slot, d in bys.items():
               + '、'.join(f'{v} ({c})' for v, c in vals.most_common()) + ' |')
 sk += ['\n## 量の文: 平年並み・傾向どおり・予想外\n',
        '1 つの文 (行) の中に複数の指標がある時 (発注・分野・地域) は、年ごとに最も情報の大きい指標で数える。\n',
-       '| 文 | 平年並み | 平年と違うが傾向どおり | 予想外 | かなり予想外 | 予想外だった年 (指標) |', '|---|---:|---:|---:|---:|---|']
+       '| 文 | 平年並み | 平年と違うが短期傾向どおり | 予想外 | かなり予想外 | 予想外だった年 (指標) |', '|---|---:|---:|---:|---:|---|']
 grp = collections.defaultdict(lambda: collections.defaultdict(list))
 for y, slot, kind, value, info in SLOTS:
     if kind == 'z':

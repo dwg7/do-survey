@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""北海道の「地勢」(毎年ほぼ同じ特徴) を、他の地方と比べて北海道に固有かを試す (D21)。
+"""北海道の「長期構造」(毎年ほぼ同じ特徴) を、他の地方と比べて北海道に固有かを試す (D21)。
 
 入力: data/raw/<区分>-<年度>.json (scripts/fetch.py --section <区分> --years 2023 2024 2025)。区分 A〜J (K・L は企画部で除く)
 出力: reports/national/compare.md
@@ -91,7 +91,7 @@ METRICS.append(('固定資産 (課税) の測量', lambda rs: share(rs, lambda r
 
 vals = {name: {sec: fn(data[sec]) for sec in SECTIONS} for name, fn in METRICS}
 
-out = ['# 北海道の「地勢」は北海道に固有か — 地方測量部の比較 (令和5〜7年度)\n',
+out = ['# 北海道の「長期構造」は北海道に固有か — 地方測量部の比較 (令和5〜7年度)\n',
        '`scripts/national_compare.py` が生成。データは国土地理院「公共測量実施情報」の地方測量部区分 A〜J の令和5〜7年度 (受付年度)。'
        'z は北海道が他の 9 地方の平均から標準偏差のいくつ分離れているか (|z| ≥ 2 を太字)。順位は 10 地方中で大きい方から。\n']
 
