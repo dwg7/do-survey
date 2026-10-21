@@ -93,12 +93,12 @@ for k in sorted(span):
     out.append(f'| {k} | {span[k]} |')
 
 # M6: 1 つの事業 (予算の上の事業) が届出にどう分かれるか — 事業の名前を含む届出を全年度で数える
-allr = list(csv.DictReader((ROOT / 'analysis/classified.csv').open()))
+allr = [r for r in csv.DictReader((ROOT / 'analysis/classified.csv').open()) if int(r['year']) <= 2025]   # 当年度 (途中) は除く
 CASES = [('国営環境保全型かんがい排水事業 別海北部地区 (開発局、農業)', '別海北部'),
          ('一般国道 39 号 端野高野道路 (開発局、道路)', '端野高野'),
          ('国営かんがい排水事業 当麻永山用水地区 (開発局、農業)', '当麻永山'),
          ('一級河川ペケレベツ川 (道、河川・砂防、台風 10 号の災害復旧助成を含む)', 'ペケレベツ')]
-out.append('\n## M6. 1 つの事業が届出に分かれる例 (事業の名前を業務名に含む届出、全年度)\n')
+out.append('\n## M6. 1 つの事業が届出に分かれる例 (事業の名前を業務名に含む届出、令和7年度まで)\n')
 out.append('| 事業 | 届出 | 年度の数 (最初〜最後) | 異なる業務名 (番号を除く) | 段階の内訳 | 業務名の例 |')
 out.append('|---|---:|---|---:|---|---|')
 for lab, key in CASES:

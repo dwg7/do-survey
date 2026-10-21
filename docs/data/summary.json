@@ -2,8 +2,8 @@
  "source": "国土地理院「公共測量実施情報」",
  "sourceUrl": "https://psgsv4.gsi.go.jp/giaSearch/",
  "section": "A 北海道地方測量部",
- "fetchedAt": "2026-09-24T12:37:05+00:00",
- "lastReceptDate": "2026-09-17",
+ "fetchedAt": "2026-10-21T09:53:58+00:00",
+ "lastReceptDate": "2026-10-15",
  "years": [
   {
    "year": 1983,
@@ -222,8 +222,8 @@
   },
   {
    "year": 2026,
-   "surveys": 629,
-   "withRegion": 506
+   "surveys": 698,
+   "withRegion": 558
   }
  ],
  "unresolved": {

@@ -30,7 +30,7 @@ python3 -m http.server 8767 --directory docs   # http://localhost:8767/
 
 | ファイル | 内容 |
 |---|---|
-| `data/surveys.parquet` | GeoParquet 1.0.0 (zstd)。北海道 (区分 A) の測量 1 件 = 1 行、17,514 件。`geometry` は実施地域図 (EPSG:4326、2004 年度以降)、`muni_codes` は現在の市町村コードのリスト |
+| `data/surveys.parquet` | GeoParquet 1.0.0 (zstd)。北海道 (区分 A) の測量 1 件 = 1 行、17,583 件 (2026-10-21 取得、2026 年度は 10/15 受付分まで)。`geometry` は実施地域図 (EPSG:4326、2004 年度以降)、`muni_codes` は現在の市町村コードのリスト |
 | `data/name-aliases.csv` | 旧町村名・札幌市の区名などを現在の市町村に読み替える表 (施行日と根拠付き) |
 | `data/external/*.csv` | 分析で使う外部資料から抜き出した表 (開発局の当初・補正予算、道の当初予算・委託契約、住民基本台帳人口、都市計画基礎調査の対象と基準日)。各行に出典 URL |
 | `analysis/*-rules.csv` | 発注主体・分野とねらい・段階の分類規則 (`scripts/classify.py` が使う) |
