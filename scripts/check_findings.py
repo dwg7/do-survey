@@ -3,7 +3,8 @@
 
 使い方: python3 scripts/check_findings.py
 
-台帳は 1 行 1 発見。列: id, claim (主張), status, evidence (根拠のレポート), oracle (確かめた外部資料), years, decision (D 番号), superseded_by。
+台帳は 1 行 1 発見。列: id, claim (主張), status, perspective (内部説明 / 社会接続仮説 / 接続先未発見),
+evidence (根拠のレポート), oracle (確かめた外部資料), years, decision (D 番号), superseded_by。
 status:
   確認     外部資料 (oracle) か独立のデータで裏付けた
   集計     公共測量実施情報の集計で示した (外部の裏付けはない)
@@ -21,6 +22,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 STATUS = ['確認', '集計', '推定', '否定', '置き換え']
+PERSPECTIVES = ['内部説明', '社会接続仮説', '接続先未発見']
 rows = list(csv.DictReader((ROOT / 'reports/findings.csv').open()))
 ids = {r['id'] for r in rows}
 decisions = set(re.findall(r'^## (D\d+)', (ROOT / 'DECISIONS.md').read_text(), re.M))
@@ -31,6 +33,8 @@ for r in rows:
     i = r['id']
     if r['status'] not in STATUS:
         errors.append(f'{i}: status が不正 ({r["status"]})')
+    if r['perspective'] not in PERSPECTIVES:
+        errors.append(f'{i}: perspective が不正 ({r["perspective"]})')
     if not (ROOT / r['evidence']).exists():
         errors.append(f'{i}: evidence がない ({r["evidence"]})')
     if r['decision'] and r['decision'] not in decisions:
@@ -45,19 +49,23 @@ for r in rows:
 by = collections.defaultdict(list)
 for r in rows:
     by[r['status']].append(r)
+by_perspective = collections.defaultdict(list)
+for r in rows:
+    by_perspective[r['perspective']].append(r)
 out = ['# 発見の台帳\n',
        '`reports/findings.csv` から `scripts/check_findings.py` が生成。1 行 1 発見。状態の意味は台帳のスクリプトの冒頭。',
        '主張の言い回しは要約で、正確な内容は根拠のレポートにある。\n',
        '| 状態 | 件数 |', '|---|---:|'] + [f'| {s} | {len(by[s])} |' for s in STATUS]
+out += ['\n| 区別 | 件数 |', '|---|---:|'] + [f'| {p} | {len(by_perspective[p])} |' for p in PERSPECTIVES]
 for s in STATUS:
     if not by[s]:
         continue
     out.append(f'\n## {s}\n')
-    out.append('| id | 主張 | 根拠 | 外部資料 | 年度 | 記録 | 置き換えた発見 |')
-    out.append('|---|---|---|---|---|---|---|')
+    out.append('| id | 主張 | 区別 | 根拠 | 外部資料 | 年度 | 記録 | 置き換えた発見 |')
+    out.append('|---|---|---|---|---|---|---|---|')
     for r in by[s]:
         ev = r['evidence'].replace('reports/', '')
-        out.append(f'| {r["id"]} | {r["claim"]} | [{ev}]({ev}) | {r["oracle"] or "—"} | {r["years"]} | {r["decision"]} | {r["superseded_by"] or ""} |')
+        out.append(f'| {r["id"]} | {r["claim"]} | {r["perspective"]} | [{ev}]({ev}) | {r["oracle"] or "—"} | {r["years"]} | {r["decision"]} | {r["superseded_by"] or ""} |')
 (ROOT / 'reports/findings.md').write_text('\n'.join(out) + '\n')
 print(f'{len(rows)} 件 (' + '、'.join(f'{s} {len(by[s])}' for s in STATUS) + ')。reports/findings.md を書いた。')
 for e in errors:
